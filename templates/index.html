@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Traducción Texto-Braille Multiparadigma</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 15px;
+            backdrop-filter: blur(10px);
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+
+        .panel {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .panel:hover {
+            transform: translateY(-5px);
+        }
+
+        .panel h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+            font-size: 1.5rem;
+            text-align: center;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #555;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 150px;
+            padding: 15px;
+            border: 2px solid #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+
+        .braille-output {
+            font-size: 24px;
+            font-family: 'Courier New', monospace;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 10px;
+            padding: 15px;
+            min-height: 150px;
+            white-space: pre-wrap;
+            line-height: 1.6;
+        }
+
+        .btn {
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+            padding: 12px 30px;
+            border: none;
+            border-radius: 25px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            margin-bottom: 10px;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, #6c757d, #495057);
+        }
+
+        .btn-danger {
+            background: linear-gradient(45deg, #dc3545, #c82333);
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            transition: transform 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-3px);
+        }
+
+        .stat-number {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #667eea;
+            margin-bottom: 5px;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+
+        .analysis-panel {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+        }
+
+        .analysis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
+
+        .analysis-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 4px solid #667eea;
+        }
+
+        .analysis-item strong {
+            color: #667eea;
+        }
+
+        .history-panel {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+        }
+
+        .history-item {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 10px;
+            border-left: 4px solid #28a745;
+        }
+
+        .history-item.braille-to-text {
+            border-left-color: #ffc107;
+        }
+
+        .history-meta {
+            font-size: 0.9rem;
+            color: #666;
+            margin-bottom: 5px;
+        }
+
+        .error-message {
+            background: #f8d7da;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #f5c6cb;
+        }
+
+        .success-message {
+            background: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            border: 1px solid #c3e6cb;
+        }
+
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 10px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .paradigm-info {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            color: white;
+        }
+
+        .paradigm-info h3 {
+            margin-bottom: 15px;
+            color: #fff;
+        }
+
+        .paradigm-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .paradigm-list li {
+            padding: 5px 0;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .paradigm-list li:before {
+            content: "•";
+            color: #ffd700;
+            font-weight: bold;
+            position: absolute;
+            left: 0;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .header h1 {
+                font-size: 2rem;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>🔤 Sistema de Traducción Texto-Braille</h1>
+            <p>Multiparadigma • Bidireccional • Análisis Avanzado</p>
+            
+            <div class="paradigm-info">
+                <h3>Paradigmas Implementados:</h3>
+                <ul class="paradigm-list">
+                    <li><strong>Programación Orientada a Objetos:</strong> Clases TraductorBraille y AnalizadorTexto</li>
+                    <li><strong>Programación Funcional:</strong> Funciones puras para transformaciones</li>
+                    <li><strong>Programación Estructurada:</strong> Control de flujo y manejo de excepciones</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="stats-grid">
+            <div class="stat-card">
+                <div class="stat-number" id="traducciones-count">0</div>
+                <div class="stat-label">Traducciones</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="caracteres-count">0</div>
+                <div class="stat-label">Caracteres</div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-number" id="errores-count">0</div>
+                <div class="stat-label">Errores</div>
+            </div>
+        </div>
+
+        <div class="main-content">
+            <div class="panel">
+                <h2>📝 Texto a Braille</h2>
+                <form id="texto-form">
+                    <div class="form-group">
+                        <label for="texto-input">Ingresa tu texto:</label>
+                        <textarea 
+                            id="texto-input" 
+                            placeholder="Escribe aquí el texto que deseas convertir a Braille..."
+                            maxlength="1000"
+                        ></textarea>
+                    </div>
+                    <button type="submit" class="btn">Convertir a Braille</button>
+                </form>
+                
+                <div class="form-group">
+                    <label>Resultado en Braille:</label>
+                    <div id="braille-output" class="braille-output"></div>
+                </div>
+            </div>
+
+            <div class="panel">
+                <h2>⠃ Braille a Texto</h2>
+                <form id="braille-form">
+                    <div class="form-group">
+                        <label for="braille-input">Ingresa texto en Braille:</label>
+                        <textarea 
+                            id="braille-input" 
+                            placeholder="Pega aquí el texto en Braille..."
+                            maxlength="1000"
+                        ></textarea>
+                    </div>
+                    <button type="submit" class="btn">Convertir a Texto</button>
+                </form>
+                
+                <div class="form-group">
+                    <label>Resultado en Texto:</label>
+                    <div id="texto-output" class="braille-output"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="analysis-panel">
+            <h2>📊 Análisis de Texto</h2>
+            <div id="analysis-content">
+                <p>Realiza una traducción de texto a Braille para ver el análisis detallado.</p>
+            </div>
+        </div>
+
+        <div class="history-panel">
+            <h2>📚 Historial de Traducciones</h2>
+            <div style="margin-bottom: 20px;">
+                <button class="btn btn-secondary" onclick="cargarHistorial()">Actualizar Historial</button>
+                <button class="btn btn-danger" onclick="limpiarHistorial()">Limpiar Historial</button>
+            </div>
+            <div id="history-content">
+                <p>El historial aparecerá aquí después de realizar traducciones.</p>
+            </div>
+        </div>
+
+        <div class="loading" id="loading">
+            <div class="spinner"></div>
+            <p>Procesando...</p>
+        </div>
+    </div>
+
+    <script>
+        // Variables globales
+        let estadisticas = {
+            traducciones_realizadas: 0,
+            caracteres_procesados: 0,
+            errores: 0
+        };
+
+        // Función para mostrar mensajes
+        function mostrarMensaje(mensaje, tipo = 'success') {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = tipo === 'success' ? 'success-message' : 'error-message';
+            messageDiv.textContent = mensaje;
+            
+            const container = document.querySelector('.container');
+            container.insertBefore(messageDiv, container.firstChild);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+
+        // Función para mostrar/ocultar loading
+        function toggleLoading(show) {
+            const loading = document.getElementById('loading');
+            loading.style.display = show ? 'block' : 'none';
+        }
+
+        // Función para actualizar estadísticas
+        function actualizarEstadisticas() {
+            fetch('/estadisticas')
+                .then(response => response.json())
+                .then(data => {
+                    if (data.exito) {
+                        estadisticas = data.estadisticas;
+                        document.getElementById('traducciones-count').textContent = estadisticas.traducciones_realizadas;
+                        document.getElementById('caracteres-count').textContent = estadisticas.caracteres_procesados;
+                        document.getElementById('errores-count').textContent = estadisticas.errores;
+                    }
+                })
+                .catch(error => {
+                    console.error('Error al actualizar estadísticas:', error);
+                });
+        }
+
+        // Función para mostrar análisis
+        function mostrarAnalisis(analisis) {
+            const analysisContent = document.getElementById('analysis-content');
+            
+            const analysisHTML = `
+                <div class="analysis-grid">
+                    <div class="analysis-item">
+                        <strong>Contiene Acentos:</strong> ${analisis.contiene_acentos ? 'Sí' : 'No'}
+                    </div>
+                </div>
+                
+                <div style="margin-top: 20px;">
+                    <h3>Frecuencia de Caracteres:</h3>
+                    <div class="analysis-grid">
+                        ${Object.entries(analisis.frecuencia_caracteres)
+                            .sort(([,a], [,b]) => b - a)
+                            .slice(0, 10)
+                            .map(([char, count]) => `
+                                <div class="analysis-item">
+                                    <strong>'${char}':</strong> ${count} veces
+                                </div>
+                            `).join('')}
+                    </div>
+                </div>
+            `;
+            
+            analysisContent.innerHTML = analysisHTML;
+        }
+
+        // Función para cargar historial
+        function cargarHistorial() {
+            toggleLoading(true);
+            
+            fetch('/historial')
+                .then(response => response.json())
+                .then(data => {
+                    toggleLoading(false);
+                    
+                    if (data.exito) {
+                        const historyContent = document.getElementById('history-content');
+                        
+                        if (data.historial.length === 0) {
+                            historyContent.innerHTML = '<p>No hay traducciones en el historial.</p>';
+                            return;
+                        }
+                        
+                        const historyHTML = data.historial.map(item => `
+                            <div class="history-item ${item.tipo.replace('_', '-')}">
+                                <div class="history-meta">
+                                    <strong>${item.tipo === 'texto_a_braille' ? 'Texto → Braille' : 'Braille → Texto'}</strong>
+                                    • ${item.timestamp}
+                                </div>
+                                <div><strong>Entrada:</strong> ${item.entrada.substring(0, 100)}${item.entrada.length > 100 ? '...' : ''}</div>
+                                <div><strong>Salida:</strong> ${item.salida.substring(0, 100)}${item.salida.length > 100 ? '...' : ''}</div>
+                            </div>
+                        `).join('');
+                        
+                        historyContent.innerHTML = historyHTML;
+                    } else {
+                        mostrarMensaje('Error al cargar historial: ' + data.error, 'error');
+                    }
+                })
+                .catch(error => {
+                    toggleLoading(false);
+                    mostrarMensaje('Error de conexión al cargar historial', 'error');
+                    console.error('Error:', error);
+                });
+        }
+
+        // Función para limpiar historial
+        function limpiarHistorial() {
+            if (!confirm('¿Estás seguro de que quieres limpiar todo el historial?')) {
+                return;
+            }
+            
+            toggleLoading(true);
+            
+            fetch('/limpiar-historial', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    toggleLoading(false);
+                    
+                    if (data.exito) {
+                        mostrarMensaje('Historial limpiado exitosamente');
+                        document.getElementById('history-content').innerHTML = '<p>El historial ha sido limpiado.</p>';
+                    } else {
+                        mostrarMensaje('Error al limpiar historial: ' + data.error, 'error');
+                    }
+                })
+                .catch(error => {
+                    toggleLoading(false);
+                    mostrarMensaje('Error de conexión al limpiar historial', 'error');
+                    console.error('Error:', error);
+                });
+        }
+
+        // Función para traducir texto a braille
+        function traducirTextoABraille(evento) {
+            evento.preventDefault();
+            
+            const texto = document.getElementById('texto-input').value.trim();
+            
+            if (!texto) {
+                mostrarMensaje('Por favor ingresa un texto para traducir', 'error');
+                return;
+            }
+            
+            toggleLoading(true);
+            
+            fetch('/traducir', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    texto: texto,
+                    tipo: 'texto_a_braille'
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    toggleLoading(false);
+                    
+                    if (data.exito) {
+                        document.getElementById('braille-output').textContent = data.resultado;
+                        mostrarMensaje(`Traducción exitosa: ${data.caracteres_procesados} caracteres procesados`);
+                        
+                        if (data.analisis) {
+                            mostrarAnalisis(data.analisis);
+                        }
+                        
+                        actualizarEstadisticas();
+                        cargarHistorial();
+                    } else {
+                        mostrarMensaje('Error en la traducción: ' + data.error, 'error');
+                    }
+                })
+                .catch(error => {
+                    toggleLoading(false);
+                    mostrarMensaje('Error de conexión', 'error');
+                    console.error('Error:', error);
+                });
+        }
+
+        // Función para traducir braille a texto
+        function traducirBrailleATexto(evento) {
+            evento.preventDefault();
+            
+            const braille = document.getElementById('braille-input').value.trim();
+            
+            if (!braille) {
+                mostrarMensaje('Por favor ingresa texto en Braille para traducir', 'error');
+                return;
+            }
+            
+            toggleLoading(true);
+            
+            fetch('/traducir', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    texto: braille,
+                    tipo: 'braille_a_texto'
+                })
+            })
+                .then(response => response.json())
+                .then(data => {
+                    toggleLoading(false);
+                    
+                    if (data.exito) {
+                        document.getElementById('texto-output').textContent = data.resultado;
+                        mostrarMensaje(`Traducción exitosa: ${data.caracteres_procesados} caracteres procesados`);
+                        
+                        actualizarEstadisticas();
+                        cargarHistorial();
+                    } else {
+                        mostrarMensaje('Error en la traducción: ' + data.error, 'error');
+                    }
+                })
+                .catch(error => {
+                    toggleLoading(false);
+                    mostrarMensaje('Error de conexión', 'error');
+                    console.error('Error:', error);
+                });
+        }
+
+        // Event listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Formularios
+            document.getElementById('texto-form').addEventListener('submit', traducirTextoABraille);
+            document.getElementById('braille-form').addEventListener('submit', traducirBrailleATexto);
+            
+            // Cargar datos iniciales
+            actualizarEstadisticas();
+            cargarHistorial();
+            
+            // Auto-guardar en localStorage (simulado con variables)
+            const textoInput = document.getElementById('texto-input');
+            const brailleInput = document.getElementById('braille-input');
+            
+            textoInput.addEventListener('input', function() {
+                // Simular guardado automático
+                console.log('Texto guardado automáticamente');
+            });
+            
+            brailleInput.addEventListener('input', function() {
+                // Simular guardado automático
+                console.log('Braille guardado automáticamente');
+            });
+            
+            // Contador de caracteres
+            textoInput.addEventListener('input', function() {
+                const length = this.value.length;
+                const maxLength = this.getAttribute('maxlength');
+                
+                if (length > maxLength * 0.9) {
+                    this.style.borderColor = '#ffc107';
+                } else {
+                    this.style.borderColor = '#e0e0e0';
+                }
+            });
+            
+            brailleInput.addEventListener('input', function() {
+                const length = this.value.length;
+                const maxLength = this.getAttribute('maxlength');
+                
+                if (length > maxLength * 0.9) {
+                    this.style.borderColor = '#ffc107';
+                } else {
+                    this.style.borderColor = '#e0e0e0';
+                }
+            });
+        });
+
+        // Función para copiar al portapapeles
+        function copiarAlPortapapeles(texto) {
+            navigator.clipboard.writeText(texto).then(function() {
+                mostrarMensaje('Texto copiado al portapapeles');
+            }, function(err) {
+                mostrarMensaje('Error al copiar al portapapeles', 'error');
+            });
+        }
+
+        // Agregar botones de copia
+        document.addEventListener('DOMContentLoaded', function() {
+            const brailleOutput = document.getElementById('braille-output');
+            const textoOutput = document.getElementById('texto-output');
+            
+            // Agregar funcionalidad de clic para copiar
+            brailleOutput.addEventListener('click', function() {
+                if (this.textContent.trim()) {
+                    copiarAlPortapapeles(this.textContent);
+                }
+            });
+            
+            textoOutput.addEventListener('click', function() {
+                if (this.textContent.trim()) {
+                    copiarAlPortapapeles(this.textContent);
+                }
+            });
+            
+            // Agregar tooltip
+            brailleOutput.title = 'Haz clic para copiar';
+            textoOutput.title = 'Haz clic para copiar';
+        });
+    </script>
+</body>
+</html>">
+                        <strong>Longitud Total:</strong> ${analisis.longitud_total} caracteres
+                    </div>
+                    <div class="analysis-item">
+                        <strong>Sin Espacios:</strong> ${analisis.longitud_sin_espacios} caracteres
+                    </div>
+                    <div class="analysis-item">
+                        <strong>Palabras:</strong> ${analisis.palabras}
+                    </div>
+                    <div class="analysis-item">
+                        <strong>Caracteres Únicos:</strong> ${analisis.caracteres_unicos}
+                    </div>
+                    <div class="analysis-item">
+                        <strong>Caracteres Especiales:</strong> ${analisis.caracteres_especiales}
+                    </div>
+                    <div class="analysis-item">
+                        <strong>Solo Números:</strong> ${analisis.es_solo_numeros ? 'Sí' : 'No'}
+                    </div>
+                    <div class="analysis-item
