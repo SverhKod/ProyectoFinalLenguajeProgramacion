@@ -1,32 +1,19 @@
-# Conversor Braille-Texto Multiparadigma
+# Sistema de Traducción Texto-Braille Multiparadigma
 
-> Proyecto Final de la Unidad: Aplicación de Programación Multiparadigma en Python
+Este proyecto implementa un traductor bidireccional entre texto y Braille, aplicando conceptos de programación multiparadigma.
 
----
+## Características
 
-## **Descripción del Proyecto**
+- **Programación Orientada a Objetos**: Clases para el traductor y análisis
+- **Programación Funcional**: Funciones puras para transformaciones
+- **Programación Estructurada**: Control de flujo y manejo de excepciones
+- **Interfaz Web**: Aplicación web completa con Flask
+- **Análisis de Texto**: Estadísticas detalladas del texto procesado
+- **Historial**: Seguimiento de traducciones realizadas
 
-Este software permite convertir texto plano a Braille y viceversa, demostrando el uso de **tres paradigmas de programación**: estructurada, orientada a objetos y funcional. Es ideal para comprender cómo combinar estos enfoques para resolver problemas reales de accesibilidad y traducción de textos.
+## Instalación
 
----
+1. Instala las dependencias:
 
-## **Características**
-
-- Conversión **Texto → Braille** y **Braille → Texto**.
-- Conversión por lotes (procesa múltiples textos).
-- Historial de conversiones y estadísticas automáticas.
-- **Manejo robusto de excepciones** y validación de entradas.
-- Interfaz de usuario por línea de comandos (**CLI**).
-- (Opcional) Interfaz gráfica con **Tkinter** (`ui/gui.py`).
-
----
-
-## **Ejecución del Programa**
-
-### 1. **Requisitos**
-
-- Python 3.8 o superior
-- (Opcional) Instala dependencias:
-
-  ```bash
-  pip install -r requirements.txt
+```bash
+pip install -r requirements.txt
