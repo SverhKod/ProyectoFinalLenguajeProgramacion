@@ -1,0 +1,21 @@
+{% extends "base_accessible.html" %}
+{% block content %}
+<section class="converter-card" style="max-width:800px;">
+    <h2>Historial de Conversiones</h2>
+    <input type="text" id="historySearch" placeholder="Buscar en historial por texto, resultado o modo..." style="width:100%;margin-bottom:1em;">
+    <table style="width:100%;background:#222;color:#fff;border-radius:8px;">
+        <thead>
+            <tr>
+                <th>Entrada</th>
+                <th>Resultado</th>
+                <th>Modo</th>
+                <th>Fecha</th>
+            </tr>
+        </thead>
+        <tbody id="historyBody">
+            <!-- JS rellena aquí -->
+        </tbody>
+    </table>
+</section>
+<script src="{{ url_for('static', filename='js/history.js') }}"></script>
+{% endblock %}
