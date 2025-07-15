@@ -1,0 +1,233 @@
+body.high-contrast {
+    background: #181b1e;
+    color: #FAFAFA;
+    font-size: 1.15em;
+    font-family: 'Segoe UI', Arial, sans-serif;
+    margin: 0;
+    min-height: 100vh;
+}
+
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #23272a;
+    padding: 1em 2em;
+    box-shadow: 0 2px 12px #0004;
+}
+
+.logo {
+    display: flex;
+    align-items: center;
+    gap: 0.8em;
+    font-size: 1.4em;
+    color: #FFD700;
+    font-weight: bold;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 2em;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-links a {
+    color: #FFD700;
+    text-decoration: none;
+    font-weight: bold;
+    letter-spacing: 0.05em;
+    padding: 0.3em 0.8em;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+.nav-links a:hover,
+.nav-links a[aria-current="page"] {
+    background: #FFD70033;
+}
+
+.main-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 80vh;
+    padding: 2em 1em 2em 1em;
+}
+
+.converter-card {
+    background: #23272a;
+    box-shadow: 0 6px 24px #0005;
+    border-radius: 18px;
+    padding: 2.5em 2em 2em 2em;
+    margin-top: 2em;
+    max-width: 520px;
+    width: 100%;
+    transition: box-shadow 0.2s;
+    position: relative;
+}
+.converter-card:focus-within {
+    box-shadow: 0 0 0 4px #FFD70099;
+}
+
+.section-title {
+    font-size: 1.6em;
+    color: #FFD700;
+    margin-bottom: 1.3em;
+    text-align: center;
+}
+
+label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 0.5em;
+    font-size: 1.15em;
+}
+
+textarea, select {
+    width: 100%;
+    font-size: 1.17em;
+    padding: 0.85em;
+    border-radius: 10px;
+    border: 2px solid #FFD70033;
+    background: #23272a;
+    color: #FFF;
+    margin-bottom: 1.1em;
+    resize: vertical;
+}
+
+.input-group {
+    display: flex;
+    gap: 1em;
+    align-items: center;
+    margin-bottom: 1em;
+}
+
+.btn-primary, .btn-secondary {
+    background: #FFD700;
+    color: #23272a;
+    font-weight: bold;
+    border: none;
+    border-radius: 10px;
+    font-size: 1.08em;
+    padding: 0.7em 1.5em;
+    box-shadow: 0 2px 6px #FFD70022;
+    cursor: pointer;
+    transition: background 0.2s, color 0.2s;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5em;
+}
+.btn-primary:hover, .btn-secondary:hover,
+.btn-primary:focus, .btn-secondary:focus {
+    background: #ffe366;
+    color: #181b1e;
+    outline: 2px solid #FFD700;
+}
+
+.result-section {
+    margin-top: 2.5em;
+    background: #181b1e;
+    border-radius: 12px;
+    padding: 1.5em 1em;
+    min-height: 70px;
+    box-shadow: 0 1px 6px #FFD70033;
+}
+.result-actions {
+    margin-top: 1em;
+    display: flex;
+    gap: 1em;
+}
+
+.output {
+    font-size: 1.25em;
+    color: #FFD700;
+    word-break: break-all;
+    letter-spacing: 0.12em;
+    display: block;
+    min-height: 1.7em;
+    margin-bottom: 0.6em;
+    transition: background 0.4s, color 0.4s;
+}
+.result-flash {
+    animation: flash-result 0.6s;
+}
+@keyframes flash-result {
+    from { background: #ffe366; color: #222; }
+    to   { background: none; }
+}
+
+.footer {
+    width: 100%;
+    padding: 1.3em 0 0.9em 0;
+    text-align: center;
+    color: #FFD700bb;
+    background: #181b1e;
+    font-size: 1em;
+    border-top: 2px solid #23272a;
+    margin-top: auto;
+}
+
+.help-btn {
+    position: absolute;
+    top: 18px;
+    right: 24px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    outline: none;
+    z-index: 2;
+}
+.help-tooltip {
+    position: absolute;
+    top: 60px;
+    right: 24px;
+    background: #23272a;
+    color: #FFD700;
+    border-radius: 10px;
+    padding: 1em 1.2em;
+    box-shadow: 0 2px 12px #0005;
+    font-size: 1em;
+    width: 260px;
+    z-index: 10;
+}
+.help-tooltip[hidden] { display: none; }
+.help-tooltip ul { margin: 0.5em 0 0 0; padding-left: 1.1em; }
+
+.toast {
+    position: fixed;
+    bottom: 22px;
+    right: 32px;
+    background: #FFD700;
+    color: #23272a;
+    padding: 1em 1.8em;
+    border-radius: 10px;
+    box-shadow: 0 4px 18px #0008;
+    font-weight: bold;
+    font-size: 1.1em;
+    z-index: 1000;
+    opacity: 0.97;
+    transition: opacity 0.3s;
+}
+.toast[hidden] { display: none; }
+
+/* Responsive para móvil */
+@media (max-width: 600px) {
+    .converter-card {
+        padding: 1.2em 0.5em;
+    }
+    .main-content {
+        padding: 0.5em;
+    }
+    .navbar {
+        flex-direction: column;
+        gap: 0.5em;
+        padding: 1em 0.6em;
+    }
+    .section-title {
+        font-size: 1.25em;
+    }
+    .help-btn, .help-tooltip {
+        right: 8px;
+    }
+}

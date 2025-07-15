@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Braille Accessibility System</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/accessible.css') }}">
+</head>
+<body class="high-contrast">
+    <header>
+        <nav aria-label="Navegación principal" class="navbar">
+            <div class="logo">
+                <span aria-label="Logo Braille" role="img">🟡</span>
+                <span class="title">Braille Web Conversor</span>
+            </div>
+            <ul class="nav-links">
+                <li><a href="/" aria-current="page">Inicio</a></li>
+                <li><a href="#">Ayuda</a></li>
+            </ul>
+        </nav>
+    </header>
+    <main role="main" tabindex="-1" class="main-content">
+        {% block content %}{% endblock %}
+    </main>
+    <footer class="footer">
+        <small>© 2025 Braille Accessibility System – Proyecto inclusivo</small>
+    </footer>
+</body>
+</html>
