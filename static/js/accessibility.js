@@ -4,13 +4,14 @@ window.addEventListener('DOMContentLoaded', function() {
     if (first) first.focus();
 });
 
-// Navegación rápida con atajos de teclado
+// Navegación completa con Tab y flechas
 document.addEventListener('keydown', function(e) {
-    if (e.ctrlKey && e.key === 'h') {
-        window.location.href = '/history';
+    if (e.key === 'F1') { // Ayuda contextual
+        e.preventDefault();
+        document.getElementById('helpBtn').click();
     }
-    if (e.ctrlKey && e.key === 'l') {
-        const text = document.getElementById('text');
-        if (text) text.value = '';
+    if (e.key === 'F2') { // Leer resultado
+        e.preventDefault();
+        document.getElementById('ttsBtn').click();
     }
 });
