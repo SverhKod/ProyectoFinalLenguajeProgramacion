@@ -22,5 +22,11 @@
     "output": "⠓⠕⠁⠁⠁",
     "mode": "Texto → Braille",
     "date": "2025-07-15 09:31"
+  },
+  {
+    "input": "sdsdsdsdsdsdsd adasdsad asd asd asd as saas",
+    "output": "⠎⠙⠎⠙⠎⠙⠎⠙⠎⠙⠎⠙⠎⠙ ⠁⠙⠁⠎⠙⠎⠁⠙ ⠁⠎⠙ ⠁⠎⠙ ⠁⠎⠙ ⠁⠎ ⠎⠁⠁⠎",
+    "mode": "Texto → Braille",
+    "date": "2025-07-15 09:37"
   }
 ]
