@@ -10,6 +10,70 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
 </head>
 <body>
+    <nav
+      class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm fixed-top"
+    >
+      <div class="container">
+        <a class="navbar-brand fw-bold d-flex align-items-center" href="/">
+          <img
+            src="{{ url_for('static', filename='/img/logo_braille.png') }}"
+            alt="Braille World"
+            height="40"
+            class="me-2"
+            style="border-radius: 10px"
+          />
+          Braille <span class="d-none d-md-inline">World</span>
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div
+          class="collapse navbar-collapse justify-content-end"
+          id="navbarNav"
+        >
+          <ul class="navbar-nav gap-2">
+            <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
+            <li class="nav-item">
+              <a class="nav-link" href="/convertir-archivo">Conversión</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/academia">Academia</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/progreso">Progreso</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/diccionario">Diccionario</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/aprende">Aprende</a>
+            </li>
+            {% if session.usuario_id %}
+            <li class="nav-item">
+              <a class="nav-link disabled" tabindex="-1" aria-disabled="true">
+                <i class="bi bi-person-circle"></i> {{ session.usuario_nombre }}
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/logout">Cerrar sesión</a>
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="/login">Iniciar sesión</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/registro">Registro</a>
+            </li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </nav>
     <section class="hero-bg d-flex align-items-center justify-content-center" style="min-height: 60vh;">
   <div class="container hero-content text-center text-white">
     <h1 class="hero-title animate__animated animate__fadeInDown mb-3">

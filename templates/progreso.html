@@ -47,11 +47,7 @@
         {% set correctos = historial | selectattr('puntaje', 'equalto', 1) | list %}
         {% set total = historial|length %}
         {% set porcentaje = (correctos|length * 100 // total) if total > 0 else 0 %}
-        <div class="progress my-3" style="height:24px;">
-          <div class="progress-bar bg-success" role="progressbar"style="width: {{porcentaje}}%;">
-            Progreso: {{ correctos|length }}/{{ total }}
-          </div>
-        </div>
+
         {% else %}
         <div class="alert alert-info text-center">¡Aún no tienes progreso registrado!</div>
         {% endif %}

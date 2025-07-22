@@ -1,49 +1,510 @@
-{% extends 'base.html' %}
-{% block content %}
-<section class="container my-5">
-  <h1 class="display-5 fw-bold mb-4 text-center">
-    <i class="bi bi-mortarboard"></i> Aprende Braille
-  </h1>
-  <p class="lead text-center mb-5">
-    Explora materiales y tips para aprender Braille de forma autodidacta.
-  </p>
-  <div class="card p-4 mb-4">
-    <ul>
-      {% for leccion in lecciones %}
-        <li>
-          <strong>{{ leccion.titulo }}</strong>: {{ leccion.contenido }}
-          <ul>
-            {% for ejercicio in leccion.ejercicios %}
-              <li>{{ ejercicio }}</li>
-            {% endfor %}
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Aprende Braille - Tu Academia de Braille</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="../static/css/styles.css">
+    <style>
+      
+        .hero-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 80px 0;
+        }
+        
+        .card-modern {
+            border: none;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(15, 71, 136, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card-modern:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 20px 40px rgba(24, 98, 184, 0.15);
+        }
+        
+        .lesson-card {
+            background: linear-gradient(45deg, #f8f9fa, #ffffff);
+            border-left: 5px solid #667eea;
+        }
+        
+        .exercise-item {
+            background: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 8px;
+            margin: 5px 0;
+            border-left: 3px solid #28a745;
+        }
+        
+        .resource-card {
+            background: linear-gradient(45deg, #e3f2fd, #ffffff);
+            border-left: 5px solid #2196f3;
+        }
+        
+        .quiz-section {
+            background: linear-gradient(45deg, #fff3e0, #ffffff);
+            border-left: 5px solid #ff9800;
+        }
+        
+        .braille-pattern {
+            font-family: 'Courier New', monospace;
+            font-size: 1.2em;
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 5px;
+            display: inline-block;
+            margin: 5px;
+        }
+        
+        .progress-indicator {
+            height: 4px;
+            background: #e9ecef;
+            border-radius: 2px;
+            overflow: hidden;
+        }
+        
+        .progress-bar-custom {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s ease;
+        }
+        
+        .floating-icon {
+            position: absolute;
+            top: -15px;
+            left: 20px;
+            background: #667eea;
+            color: white;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+        }
+        
+        .accordion-modern .accordion-item {
+            border: none;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(36, 8, 139, 0.05);
+        }
+        
+        .accordion-modern .accordion-header button {
+            border-radius: 10px;
+            border: none;
+            background: linear-gradient(45deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .quiz-feedback {
+            animation: fadeIn 0.5s ease-in;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .learning-path {
+            position: relative;
+        }
+        
+        .learning-path::before {
+            content: '';
+            position: absolute;
+            left: 30px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, #667eea, #764ba2);
+        }
+        
+        .path-step {
+            position: relative;
+            margin-left: 60px;
+            margin-bottom: 30px;
+        }
+        
+        .path-step::before {
+            content: '';
+            position: absolute;
+            left: -45px;
+            top: 20px;
+            width: 20px;
+            height: 20px;
+            background: #667eea;
+            border-radius: 50%;
+            border: 3px solid white;
+            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+        }
+    </style>
+</head>
+<body>
+  <nav
+      class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm fixed-top"
+    >
+      <div class="container">
+        <a class="navbar-brand fw-bold d-flex align-items-center" href="/">
+          <img
+            src="{{ url_for('static', filename='/img/logo_braille.png') }}"
+            alt="Braille World"
+            height="40"
+            class="me-2"
+            style="border-radius: 10px"
+          />
+          Braille <span class="d-none d-md-inline">World</span>
+        </a>
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div
+          class="collapse navbar-collapse justify-content-end"
+          id="navbarNav"
+        >
+          <ul class="navbar-nav gap-2">
+            <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
+            <li class="nav-item">
+              <a class="nav-link" href="/convertir-archivo">Conversión</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/academia">Academia</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/progreso">Progreso</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/diccionario">Diccionario</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/aprende">Aprende</a>
+            </li>
+            {% if session.usuario_id %}
+            <li class="nav-item">
+              <a class="nav-link disabled" tabindex="-1" aria-disabled="true">
+                <i class="bi bi-person-circle"></i> {{ session.usuario_nombre }}
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/logout">Cerrar sesión</a>
+            </li>
+            {% else %}
+            <li class="nav-item">
+              <a class="nav-link" href="/login">Iniciar sesión</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="/registro">Registro</a>
+            </li>
+            {% endif %}
           </ul>
-        </li>
-      {% endfor %}
-    </ul>
-  </div>
-  <div class="card p-4 mb-4">
-    <h5>Recursos recomendados:</h5>
-    <ul>
-      {% for recurso in recursos %}
-        <li>
-          <a href="{{ recurso.url }}" target="_blank">{{ recurso.nombre }}</a>
-        </li>
-      {% endfor %}
-    </ul>
-  </div>
-  <div class="card p-4">
-    <h5>Quiz rápido: ¿Quién inventó el Braille?</h5>
-    <form method="POST">
-      <input class="form-control mb-2" name="respuesta" placeholder="Escribe tu respuesta">
-      <button class="btn btn-primary" type="submit">Verificar</button>
-    </form>
-    {% if resultado is not none %}
-      {% if resultado %}
-        <div class="alert alert-success mt-2">¡Correcto! 🎉</div>
-      {% else %}
-        <div class="alert alert-danger mt-2">Incorrecto. Intenta de nuevo.</div>
-      {% endif %}
-    {% endif %}
-  </div>
-</section>
-{% endblock %}
+        </div>
+      </div>
+    </nav>
+    <!-- Sección Hero -->
+    <section class="hero-section text-center">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8">
+                    <h1 class="display-4 fw-bold mb-4">
+                        <i class="bi bi-mortarboard me-3"></i>
+                        Aprende Braille
+                    </h1>
+                    <p class="lead fs-5 mb-4">
+                        Descubre el mundo del sistema Braille con nuestros materiales interactivos
+                        y aprende de forma autodidacta paso a paso.
+                    </p>
+                    <div class="progress-indicator mx-auto mb-4" style="width: 300px;">
+                        <div class="progress-bar-custom" style="width: 65%;"></div>
+                    </div>
+                    <p class="small">Tu progreso: 65% completado</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Contenido Principal -->
+    <section class="container my-5">
+        <!-- Ruta de Aprendizaje -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <h2 class="h3 mb-4">
+                    <i class="bi bi-map text-primary me-2"></i>
+                    Tu Ruta de Aprendizaje
+                </h2>
+                <div class="learning-path">
+                    <div class="path-step">
+                        <div class="card card-modern lesson-card">
+                            <div class="floating-icon">
+                                <i class="bi bi-info-circle"></i>
+                            </div>
+                            <div class="card-body pt-4">
+                                <h5 class="card-title fw-bold">¿Qué es el Braille?</h5>
+                                <p class="card-text">
+                                    El Braille es un sistema de lectura y escritura táctil diseñado para personas ciegas.
+                                    Fue inventado por Louis Braille en 1825 y revolucionó la educación para personas con discapacidad visual.
+                                </p>
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <h6><i class="bi bi-lightbulb text-warning me-2"></i>Dato curioso:</h6>
+                                        <p class="small">Louis Braille tenía solo 15 años cuando perfeccionó su sistema.</p>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <h6><i class="bi bi-globe text-info me-2"></i>Uso mundial:</h6>
+                                        <p class="small">Se usa en más de 180 países con adaptaciones locales.</p>
+                                    </div>
+                                </div>
+                                <div class="mt-3">
+                                    <h6>Ejercicios de comprensión:</h6>
+                                    <div class="exercise-item">
+                                        <i class="bi bi-question-circle me-2"></i>
+                                        ¿Quién inventó el Braille?
+                                    </div>
+                                    <div class="exercise-item">
+                                        <i class="bi bi-question-circle me-2"></i>
+                                        ¿En qué país se originó?
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="path-step">
+                        <div class="card card-modern lesson-card">
+                            <div class="floating-icon">
+                                <i class="bi bi-hand-index"></i>
+                            </div>
+                            <div class="card-body pt-4">
+                                <h5 class="card-title fw-bold">Cómo se lee el Braille</h5>
+                                <p class="card-text">
+                                    Cada letra se representa por un patrón de puntos en relieve organizados en una celda de 6 puntos.
+                                    Los lectores usan las yemas de los dedos para "leer" estos patrones táctiles.
+                                </p>
+                                
+                                <!-- Demostración visual de celda Braille -->
+                                <div class="row mt-3">
+                                    <div class="col-md-8">
+                                        <div class="bg-light p-3 rounded">
+                                            <h6>Estructura de una celda Braille:</h6>
+                                            <div class="d-flex align-items-center">
+                                                <div class="me-4">
+                                                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 5px; width: 30px;">
+                                                        <div style="width: 10px; height: 10px; background: #333; border-radius: 50%;"></div>
+                                                        <div style="width: 10px; height: 10px; background: #ddd; border-radius: 50%;"></div>
+                                                        <div style="width: 10px; height: 10px; background: #333; border-radius: 50%;"></div>
+                                                        <div style="width: 10px; height: 10px; background: #ddd; border-radius: 50%;"></div>
+                                                        <div style="width: 10px; height: 10px; background: #ddd; border-radius: 50%;"></div>
+                                                        <div style="width: 10px; height: 10px; background: #ddd; border-radius: 50%;"></div>
+                                                    </div>
+                                                </div>
+                                                <div>
+                                                    <span class="badge bg-primary">Letra "A"</span>
+                                                    <br><small class="text-muted">Solo punto 1 elevado</small>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="mt-3">
+                                    <h6>Preguntas de práctica:</h6>
+                                    <div class="exercise-item">
+                                        <i class="bi bi-question-circle me-2"></i>
+                                        ¿Cuántos puntos tiene una celda Braille?
+                                    </div>
+                                    <div class="exercise-item">
+                                        <i class="bi bi-question-circle me-2"></i>
+                                        ¿Cómo se representa la letra 'A'?
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recursos Recomendados -->
+        <div class="row mb-5">
+            <div class="col-12">
+                <h2 class="h3 mb-4">
+                    <i class="bi bi-bookmark-star text-success me-2"></i>
+                    Recursos Recomendados
+                </h2>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card card-modern resource-card h-100">
+                    <div class="floating-icon">
+                        <i class="bi bi-download"></i>
+                    </div>
+                    <div class="card-body pt-4">
+                        <h5 class="card-title">
+                            <i class="bi bi-file-earmark-pdf text-danger me-2"></i>
+                            Pack de Abecedario
+                        </h5>
+                        <p class="card-text">
+                            Material completo con el abecedario en Braille y LSE (Lengua de Signos Española), 
+                            incluye juegos didácticos para practicar.
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="https://www.orientacionandujar.es/2024/11/11/pack-abecedario-braille-y-lse-y-juegos-didacticos/" 
+                               target="_blank" 
+                               class="btn btn-outline-primary">
+                                <i class="bi bi-box-arrow-up-right me-2"></i>Descargar
+                            </a>
+                            <span class="badge bg-success">Gratuito</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-md-6 mb-4">
+                <div class="card card-modern resource-card h-100">
+                    <div class="floating-icon">
+                        <i class="bi bi-globe"></i>
+                    </div>
+                    <div class="card-body pt-4">
+                        <h5 class="card-title">
+                            <i class="bi bi-bug text-info me-2"></i>
+                            Braille Bug
+                        </h5>
+                        <p class="card-text">
+                            Plataforma interactiva internacional para aprender Braille con juegos, 
+                            actividades y recursos para estudiantes de todas las edades.
+                        </p>
+                        <div class="d-flex justify-content-between align-items-center">
+                            <a href="https://braillebug.org" 
+                               target="_blank" 
+                               class="btn btn-outline-info">
+                                <i class="bi bi-box-arrow-up-right me-2"></i>Visitar sitio
+                            </a>
+                            <span class="badge bg-info">Interactivo</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quiz Interactivo -->
+        <div class="row">
+            <div class="col-lg-8 mx-auto">
+                <div class="card card-modern quiz-section">
+                    <div class="floating-icon">
+                        <i class="bi bi-question-lg"></i>
+                    </div>
+                    <div class="card-body pt-4">
+                        <h3 class="card-title text-center mb-4">
+                            <i class="bi bi-trophy text-warning me-2"></i>
+                            Quiz de Conocimientos
+                        </h3>
+                        
+                        <div class="text-center mb-4">
+                            <div class="bg-light rounded-pill d-inline-block px-4 py-2">
+                                <span class="fw-bold">Pregunta 1 de 3</span>
+                            </div>
+                        </div>
+
+                        <div class="quiz-question text-center mb-4">
+                            <h5>¿Quién inventó el sistema Braille?</h5>
+                            <p class="text-muted">Escribe el nombre completo del inventor</p>
+                        </div>
+
+                        <form method="POST">
+                            <div class="row justify-content-center">
+                                <div class="col-md-8">
+                                    <div class="input-group mb-3">
+                                        <span class="input-group-text">
+                                            <i class="bi bi-pencil"></i>
+                                        </span>
+                                        <input class="form-control form-control-lg" 
+                                               name="respuesta" 
+                                               placeholder="Escribe tu respuesta aquí..."
+                                               autocomplete="off">
+                                    </div>
+                                    <div class="text-center">
+                                        <button class="btn btn-primary btn-lg px-5" type="submit">
+                                            <i class="bi bi-check-circle me-2"></i>
+                                            Verificar Respuesta
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </form>
+
+                        <!-- Resultado del quiz -->
+                        <div class="quiz-feedback">
+                            <div class="alert alert-success d-flex align-items-center mt-4" role="alert" style="display: none !important;">
+                                <i class="bi bi-check-circle-fill me-2"></i>
+                                <div>
+                                    <strong>¡Correcto! 🎉</strong> Louis Braille inventó este revolucionario sistema en 1825.
+                                    <div class="mt-2">
+                                        <small class="text-success">+10 puntos de experiencia</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="alert alert-warning d-flex align-items-center mt-4" role="alert" style="display: none !important;">
+                                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                                <div>
+                                    <strong>¡Casi! 💭</strong> Intenta de nuevo. Pista: Su apellido es el nombre del sistema.
+                                    <div class="mt-2">
+                                        <small class="text-warning">No te desanimes, sigue intentando</small>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Progreso del quiz -->
+                        <div class="mt-4">
+                            <div class="d-flex justify-content-between align-items-center mb-2">
+                                <span class="small text-muted">Progreso del quiz</span>
+                                <span class="small text-muted">33%</span>
+                            </div>
+                            <div class="progress-indicator">
+                                <div class="progress-bar-custom" style="width: 33%;"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Siguiente paso -->
+        <div class="row mt-5">
+            <div class="col-12 text-center">
+                <div class="card card-modern" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white;">
+                    <div class="card-body py-4">
+                        <h4><i class="bi bi-arrow-right-circle me-2"></i>¿Listo para el siguiente paso?</h4>
+                        <p class="mb-3">Practica lo que has aprendido con ejercicios interactivos</p>
+                        <div class="d-flex justify-content-center gap-3">
+                            <a href="/academia" class="btn btn-light">
+                                <i class="bi bi-mortarboard me-2"></i>Ir a Academia
+                            </a>
+                            <a href="/diccionario" class="btn btn-outline-light">
+                                <i class="bi bi-book me-2"></i>Consultar Diccionario
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Simulación de resultado del quiz (esto se conectaría con tu backend Flask)
+        document.addEventListener('DOMContentLoaded', function() {
+            // Aquí puedes agregar lógica para mostrar los resultados del quiz
+            // basado en la respuesta del servidor Flask
+        });
+    </script>
+</body>
+</html>
