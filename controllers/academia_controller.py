@@ -1,4 +1,5 @@
 import random
+import unicodedata
 from flask import Blueprint, render_template, request, session
 from models.braille_converter import BrailleConverter
 from models.progreso_service import ProgresoService
@@ -21,7 +22,12 @@ def academia():
     if request.method == 'POST':
         respuesta = request.form.get('respuesta', '')
         correcta = BrailleConverter.texto_a_braille(palabra)
-        if respuesta.strip() == correcta:
+
+        # 🔴 Aquí normalizamos y limpiamos ambos lados:
+        respuesta_normalizada = unicodedata.normalize('NFC', respuesta.strip())
+        correcta_normalizada = unicodedata.normalize('NFC', correcta.strip())
+
+        if respuesta_normalizada == correcta_normalizada:
             resultado = "¡Correcto!"
             puntaje = 1
         else:
@@ -30,3 +36,4 @@ def academia():
         if 'usuario_id' in session:
             ProgresoService.guardar_progreso(session['usuario_id'], ejercicio, puntaje)
     return render_template('academia.html', ejercicio=ejercicio, palabra=palabra, resultado=resultado)
+
