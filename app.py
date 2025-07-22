@@ -1,32 +1,39 @@
+# app.py – Aplicación Principal Flask
 from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session
 import os
 import logging
 from werkzeug.utils import secure_filename
 from config import Config
 
+# Importar servicios/modelos propios
 from models.database_manager import DatabaseManager
 from models.braille_converter import BrailleConverter
 from models.progreso_service import ProgresoService
-from models.usuario_service import UsuarioService
 from models.historial_service import HistorialService
+from services.usuario_service import UsuarioService
 
-
+# Configuración de logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
+# Crear aplicación Flask y configuración inicial
 app = Flask(__name__)
 app.secret_key = Config.SECRET_KEY
 app.config['UPLOAD_FOLDER'] = Config.UPLOAD_FOLDER
 ALLOWED_EXTENSIONS = Config.ALLOWED_EXTENSIONS
 
-# Crea carpeta uploads si no existe
+# Crea la carpeta de uploads si no existe
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
 def allowed_file(filename):
+    """Verifica si el archivo tiene una extensión permitida."""
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+# ----------------- RUTAS PRINCIPALES -----------------
 
 @app.route('/')
 def index():
+    """Página de inicio con estadísticas generales."""
     try:
         estadisticas = HistorialService.obtener_estadisticas()
         return render_template('index.html', estadisticas=estadisticas)
@@ -34,23 +41,43 @@ def index():
         logger.error(f"Error en página de inicio: {e}")
         return render_template('index.html', estadisticas=[])
 
-# (Las demás rutas igual que en tu código, solo importa los servicios desde models)
 
-# Ejemplo para una ruta:
+    """Ruta para inicio de sesión sencillo (solo email)."""
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip()
+        usuario = UsuarioService.obtener_usuario_por_email(email)
+        if usuario:
+            session['usuario_id'] = usuario['id']
+            session['usuario_nombre'] = usuario['nombre']
+            flash(f'¡Bienvenido, {usuario["nombre"]}!', 'success')
+            return redirect(url_for('index'))
+        else:
+            flash('Usuario no encontrado.', 'danger')
+    return render_template('login.html')
+
+@app.route('/logout')
+def logout():
+    """Cerrar sesión del usuario."""
+    session.clear()
+    flash('Sesión cerrada correctamente.', 'success')
+    return redirect(url_for('index'))
+
 @app.route('/convertir-archivo', methods=['GET', 'POST'])
 def convertir_archivo():
+    """Conversión de archivos de texto a Braille."""
     if request.method == 'POST':
         try:
             if 'archivo' not in request.files:
-                flash('No se seleccionó archivo', 'error')
+                flash('No se seleccionó archivo', 'danger')
                 return redirect(request.url)
             archivo = request.files['archivo']
             if archivo.filename == '':
-                flash('No se seleccionó archivo', 'error')
+                flash('No se seleccionó archivo', 'danger')
                 return redirect(request.url)
             if archivo and allowed_file(archivo.filename):
                 contenido = archivo.read().decode('utf-8')
                 contenido_braille = BrailleConverter.procesar_archivo(contenido)
+                # Guarda conversión en historial si está logueado
                 if 'usuario_id' in session:
                     HistorialService.guardar_conversion(
                         session['usuario_id'],
@@ -68,16 +95,18 @@ def convertir_archivo():
                     }
                 })
             else:
-                flash('Tipo de archivo no permitido', 'error')
+                flash('Tipo de archivo no permitido', 'danger')
         except Exception as e:
             logger.error(f"Error procesando archivo: {e}")
-            flash('Error procesando archivo', 'error')
+            flash('Error procesando archivo', 'danger')
     return render_template('convertir_archivo.html')
-
 
 @app.route('/academia', methods=['GET', 'POST'])
 def academia():
-    # Ejemplo simple: traducir "casa" a braille
+    """
+    Página de academia interactiva: ejercicios de traducción a Braille.
+    Aquí el usuario debe traducir la palabra "casa" a Braille.
+    """
     ejercicio = 'Traduce la palabra: casa'
     palabra = 'casa'
     resultado = None
@@ -101,13 +130,77 @@ def academia():
 
 @app.route('/progreso')
 def progreso():
+    """Página de progreso personal. Solo usuarios logueados pueden verla."""
     if 'usuario_id' not in session:
         flash('Debes iniciar sesión primero', 'warning')
         return redirect(url_for('login'))
     historial = ProgresoService.obtener_progreso(session['usuario_id'], limite=20)
     return render_template('progreso.html', historial=historial)
+@app.route('/diccionario')
+def diccionario():
+    return render_template('diccionario.html')
+
+@app.route('/aprende')
+def aprende():
+    return render_template('aprende.html')
+
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+
+    """Ruta para inicio de sesión sencillo (solo email)."""
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip()
+        usuario = UsuarioService.obtener_usuario_por_email(email)
+        if usuario:
+            session['usuario_id'] = usuario['id']
+            session['usuario_nombre'] = usuario['nombre']
+            flash(f'¡Bienvenido, {usuario["nombre"]}!', 'success')
+            return redirect(url_for('index'))
+        else:
+            flash('Usuario no encontrado.', 'danger')
+    return render_template('login.html')
 
 
+    """Cerrar sesión del usuario."""
+    session.clear()
+    flash('Sesión cerrada correctamente.', 'success')
+    return redirect(url_for('index'))
+    """Ruta para inicio de sesión sencillo (solo email)."""
+    if request.method == 'POST':
+        email = request.form.get('email', '').strip()
+        usuario = UsuarioService.obtener_usuario_por_email(email)
+        if usuario:
+            session['usuario_id'] = usuario['id']
+            session['usuario_nombre'] = usuario['nombre']
+            flash(f'¡Bienvenido, {usuario["nombre"]}!', 'success')
+            return redirect(url_for('index'))
+        else:
+            flash('Usuario no encontrado.', 'danger')
+    return render_template('login.html')
+
+
+    """Cerrar sesión del usuario."""
+    session.clear()
+    flash('Sesión cerrada correctamente.', 'success')
+    return redirect(url_for('index'))
+@app.route('/registro', methods=['GET', 'POST'])
+def registro():
+    """Registro de nuevo usuario."""
+    if request.method == 'POST':
+        nombre = request.form.get('nombre', '').strip()
+        email = request.form.get('email', '').strip()
+        if not nombre or not email:
+            flash('Debes ingresar nombre y correo.', 'danger')
+        elif UsuarioService.obtener_usuario_por_email(email):
+            flash('Ese correo ya está registrado.', 'danger')
+        else:
+            UsuarioService.crear_usuario(nombre, email)
+            flash('¡Usuario creado! Ahora inicia sesión.', 'success')
+            return redirect(url_for('login'))
+    return render_template('registro.html')
+
+
+# ----------------- INICIO DE LA APP -----------------
 if __name__ == '__main__':
     try:
         connection = DatabaseManager.get_connection()

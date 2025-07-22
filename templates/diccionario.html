@@ -1,0 +1,18 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="container my-5">
+  <h1 class="display-5 fw-bold mb-4 text-center"><i class="bi bi-book"></i> Diccionario Braille</h1>
+  <p class="lead text-center mb-5">Busca una letra, número o símbolo para ver cómo se representa en Braille.</p>
+  <!-- Aquí puedes poner una tabla, buscador JS, o una lista de símbolos Braille -->
+  <div class="card p-4">
+    <table class="table">
+      <thead><tr><th>Letra</th><th>Braille</th></tr></thead>
+      <tbody>
+        <tr><td>A</td><td>⠁</td></tr>
+        <tr><td>B</td><td>⠃</td></tr>
+        <!-- etc... -->
+      </tbody>
+    </table>
+  </div>
+</section>
+{% endblock %}
