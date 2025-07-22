@@ -1,37 +1,71 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <title>Braille App</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css" rel="stylesheet">
-    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <meta charset="UTF-8">
+  <title>{% block title %}Braille World{% endblock %}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <!-- Tus estilos personalizados primero -->
+  <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+  <!-- Bootstrap CSS -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
+  <!-- Animate.css -->
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
 </head>
 <body>
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
-      <div class="container">
-        <a class="navbar-brand" href="/"><i class="bi bi-eye"></i> Braille App</a>
-        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-          <span class="navbar-toggler-icon"></span>
-        </button>
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
-            <li class="nav-item"><a class="nav-link" href="/aprende">Aprende Braille</a></li>
-            <li class="nav-item"><a class="nav-link" href="/convertir-texto">Convertir texto en vivo</a></li>
-          </ul>
-        </div>
+  <!-- NAVBAR PRO -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark shadow-sm fixed-top">
+    <div class="container">
+      <a class="navbar-brand fw-bold d-flex align-items-center" href="/">
+        <img src="{{ url_for('static', filename='/img/logo_braille.png') }}" alt="Braille World" height="40" class="me-2" style="border-radius: 10px;">
+        Braille <span class="d-none d-md-inline">World</span>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+        <ul class="navbar-nav gap-2">
+          <li class="nav-item"><a class="nav-link" href="/">Inicio</a></li>
+          <li class="nav-item"><a class="nav-link" href="/convertir-archivo">Conversión</a></li>
+          <li class="nav-item"><a class="nav-link" href="/academia">Academia</a></li>
+          <li class="nav-item"><a class="nav-link" href="/progreso">Progreso</a></li>
+          <li class="nav-item"><a class="nav-link" href="/diccionario">Diccionario</a></li>
+          <li class="nav-item"><a class="nav-link" href="/aprende">Aprende</a></li>
+        </ul>
       </div>
-    </nav>
+    </div>
+  </nav>
+  <!-- Espacio para navbar fijo -->
+  <div style="height:70px"></div>
 
-    <!-- Header -->
-    <header class="bg-light py-5 mb-4">
-      <div class="container text-center">
-        <h1 class="display-4">Bienvenido a la Braille App</h1>
-        <p class="lead">Convierte tus archivos o texto en Braille y aprende jugando.</p>
-      </div>
-    </header>
-    {% block content %}{% endblock %}
+  {% with messages = get_flashed_messages(with_categories=true) %}
+  {% if messages %}
+    <div class="container mt-2">
+      {% for category, message in messages %}
+        <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+          {{ message }}
+          <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+      {% endfor %}
+    </div>
+  {% endif %}
+  {% endwith %}
+
+  {% block content %}{% endblock %}
+
+  <footer class="bg-dark text-white py-4 mt-5">
+    <div class="container text-center small">
+      Braille App © 2025 · Creado por estudiantes de Ingeniería de Software ·
+      <a href="mailto:soporte@brailleapp.com" class="text-white-50 ms-2">
+        <i class="bi bi-envelope"></i> Contacto
+      </a>
+    </div>
+  </footer>
+
+  <!-- Tus scripts -->
+  <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+  <!-- Bootstrap JS -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

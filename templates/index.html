@@ -10,30 +10,31 @@
     <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
 </head>
 <body>
-    <!-- Hero Section -->
-    <section class="hero-bg d-flex align-items-center justify-content-center style="min-height: 100vh;">
-        <div class="container hero-content">
-            <div class="row justify-content-center text-center text-white">
-                <div class="col-lg-10">
-                    <h1 class="hero-title animate__animated animate__fadeInDown">
-                        <i class="bi bi-eye-fill me-3"></i>Braille World
-                    </h1>
-                    <p class="hero-subtitle animate__animated animate__fadeInUp animate__delay-1s">
-                        Transforma la forma en que interactúas con el Braille.<br>
-                        <strong>Convierte, aprende y domina</strong> el sistema de lectura táctil más importante del mundo.
-                    </p>
-                    <div class="d-flex flex-column flex-md-row gap-3 justify-content-center animate__animated animate__fadeInUp animate__delay-2s">
-                        <a href="#servicios" class="btn btn-modern btn-primary-modern">
-                            <i class="bi bi-rocket-takeoff me-2"></i>Descubrir funciones
-                        </a>
-                        <a href="/convertir-archivo" class="btn btn-modern btn-outline-modern">
-                            <i class="bi bi-cloud-upload me-2"></i>Convertir ahora
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </section>
+    <section class="hero-bg d-flex align-items-center justify-content-center" style="min-height: 60vh;">
+  <div class="container hero-content text-center text-white">
+    <h1 class="hero-title animate__animated animate__fadeInDown mb-3">
+      <img src="{{ url_for('static', filename='img/logo_braille.png') }}" height="56" style="vertical-align:middle; border-radius:12px;" class="me-2">
+      <span>Braille World</span>
+    </h1>
+    <p class="hero-subtitle animate__animated animate__fadeInUp animate__delay-1s mb-4">
+      Convierte archivos, aprende Braille y sigue tu progreso con <b>herramientas modernas y accesibles.</b>
+    </p>
+    <div class="d-flex flex-column flex-md-row gap-3 justify-content-center animate__animated animate__fadeInUp animate__delay-2s">
+      <a href="/convertir-archivo" class="btn btn-modern btn-primary-modern btn-lg">
+        <i class="bi bi-cloud-upload me-2"></i>Convertir Ahora
+      </a>
+      <a href="/academia" class="btn btn-modern btn-success-modern btn-lg">
+        <i class="bi bi-controller me-2"></i>Comenzar Academia
+      </a>
+      <a href="/diccionario" class="btn btn-modern btn-outline-modern btn-lg">
+        <i class="bi bi-book me-2"></i>Diccionario Braille
+      </a>
+    </div>
+  </div>
+</section>
+
+
+    
 
     <!-- Estadísticas -->
     <section class="container">

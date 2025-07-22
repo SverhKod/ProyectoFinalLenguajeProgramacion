@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="hero-bg d-flex align-items-center" style="min-height: 250px; border-radius: 0 0 30px 30px;">
+  <div class="container text-center text-white py-4">
+    <h1 class="display-5 fw-bold mb-2 animate__animated animate__fadeInDown">
+      <i class="bi bi-controller me-2"></i> Academia Interactiva
+    </h1>
+    <p class="lead animate__animated animate__fadeInUp animate__delay-1s">
+      Domina el Braille con ejercicios interactivos y seguimiento de progreso.
+    </p>
+  </div>
+</section>
+
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-7">
+      <div class="card shadow-lg p-4 service-card">
+        <div class="card-body">
+          <h2 class="fw-bold mb-4 text-center">
+            <i class="bi bi-lightbulb"></i> {{ ejercicio }}
+          </h2>
+          <form method="POST" class="mb-3">
+            <div class="mb-3">
+              <label for="respuesta" class="form-label">Respuesta (escribe con letras, ve la conversión en vivo):</label>
+              <input type="text" id="respuesta" name="respuesta" class="form-control form-control-lg mb-2"
+                     value="{{ respuesta_usuario or '' }}" placeholder="Ej: casa">
+              <div id="braille-preview" class="braille-output mt-2"></div>
+            </div>
+            <button class="btn btn-modern btn-primary-modern w-100" type="submit">
+              <i class="bi bi-play"></i> Comprobar
+            </button>
+          </form>
+          {% if resultado %}
+          <div class="alert alert-info text-center animate__animated animate__fadeInUp">
+            {{ resultado | safe }}
+          </div>
+          {% endif %}
+        </div>
+      </div>
+      <div class="text-center mt-4">
+        <a href="/progreso" class="btn btn-outline-modern">
+          <i class="bi bi-graph-up"></i> Ver mi progreso
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Usa tu diccionario JS aquí
+  const brailleDict = {
+    a: "⠁", b: "⠃", c: "⠉", d: "⠙", e: "⠑", f: "⠋",
+    g: "⠛", h: "⠓", i: "⠊", j: "⠚", k: "⠅", l: "⠇",
+    m: "⠍", n: "⠝", o: "⠕", p: "⠏", q: "⠟", r: "⠗",
+    s: "⠎", t: "⠞", u: "⠥", v: "⠧", w: "⠺", x: "⠭",
+    y: "⠽", z: "⠵", " ": " ", ".": "⠲", ",": "⠂"
+    // ...agrega más según tu función
+  };
+  function convertToBraille(text) {
+    return text.toLowerCase().split("").map(char => brailleDict[char] || char).join("");
+  }
+  const respuestaInput = document.getElementById('respuesta');
+  const braillePreview = document.getElementById('braille-preview');
+  if (respuestaInput) {
+    respuestaInput.addEventListener('input', function() {
+      braillePreview.textContent = convertToBraille(this.value);
+      braillePreview.classList.add("active");
+    });
+    // Si viene con valor, muestra la conversión de una vez
+    if (respuestaInput.value) {
+      braillePreview.textContent = convertToBraille(respuestaInput.value);
+      braillePreview.classList.add("active");
+    }
+  }
+</script>
+{% endblock %}

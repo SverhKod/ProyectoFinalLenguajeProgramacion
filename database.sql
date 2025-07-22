@@ -22,3 +22,4 @@ CREATE TABLE progreso (
     fecha DATETIME DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY(usuario_id) REFERENCES usuarios(id)
 );
+

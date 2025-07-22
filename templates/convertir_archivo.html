@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+{% block content %}
+<section class="hero-bg d-flex align-items-center" style="min-height: 250px; border-radius: 0 0 30px 30px; margin-top: 30px;">
+  <div class="container text-center text-white py-4">
+    <h1 class="display-5 fw-bold mb-2 animate__animated animate__fadeInDown">
+      <i class="bi bi-file-earmark-arrow-down me-2"></i> Conversión de Archivos
+    </h1>
+    <p class="lead animate__animated animate__fadeInUp animate__delay-1s">
+      Sube un archivo de texto y obtén su versión en Braille de forma rápida y segura.
+    </p>
+  </div>
+</section>
+
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-7">
+      <div class="card shadow-lg p-4 service-card">
+        <form method="POST" enctype="multipart/form-data">
+          <div class="mb-3">
+            <label class="form-label">Selecciona tu archivo (TXT, PDF, DOCX):</label>
+            <input type="file" name="archivo" class="form-control" accept=".txt,.pdf,.docx" required>
+          </div>
+          <button class="btn btn-modern btn-primary-modern w-100" type="submit">
+            <i class="bi bi-cloud-upload"></i> Convertir a Braille
+          </button>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

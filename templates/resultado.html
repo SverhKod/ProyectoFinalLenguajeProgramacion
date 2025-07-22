@@ -1,11 +1,36 @@
 {% extends 'base.html' %}
 {% block content %}
-<div class="container">
-    <h2 class="mt-4">Resultado en Braille</h2>
-    <div class="alert alert-success">
-        <strong>Texto original:</strong> {{ texto }}<br>
-        <strong>Braille:</strong> {{ resultado }}
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-8">
+      <div class="card shadow p-4">
+        <h3 class="fw-bold mb-3 text-center">
+          <i class="bi bi-file-earmark-check"></i> Resultado de Conversión
+        </h3>
+        <div class="mb-3">
+          <strong>Archivo original:</strong> {{ nombre_archivo }}
+        </div>
+        <div class="mb-3">
+          <strong>Contenido original:</strong>
+          <pre class="bg-light p-2 rounded">{{ contenido_original }}</pre>
+        </div>
+        <div class="mb-3">
+          <strong>Contenido en Braille:</strong>
+          <pre class="bg-dark text-white p-2 rounded">{{ contenido_braille }}</pre>
+        </div>
+        <div class="mb-3">
+          <strong>Estadísticas:</strong>
+          <ul>
+            <li>Líneas: {{ estadisticas.lineas }}</li>
+            <li>Caracteres originales: {{ estadisticas.caracteres_originales }}</li>
+            <li>Caracteres en Braille: {{ estadisticas.caracteres_braille }}</li>
+          </ul>
+        </div>
+        <a href="/convertir-archivo" class="btn btn-success w-100">
+          <i class="bi bi-arrow-left"></i> Convertir otro archivo
+        </a>
+      </div>
     </div>
-    <a href="/" class="btn btn-secondary"><i class="bi bi-arrow-left-circle"></i> Volver</a>
+  </div>
 </div>
 {% endblock %}

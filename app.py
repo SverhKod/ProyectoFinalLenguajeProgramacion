@@ -5,8 +5,8 @@ from werkzeug.utils import secure_filename
 from config import Config
 
 from models.database_manager import DatabaseManager
-
 from models.braille_converter import BrailleConverter
+from models.progreso_service import ProgresoService
 from models.usuario_service import UsuarioService
 from models.historial_service import HistorialService
 
@@ -74,7 +74,39 @@ def convertir_archivo():
             flash('Error procesando archivo', 'error')
     return render_template('convertir_archivo.html')
 
-# (Resto de tus rutas igual...)
+
+@app.route('/academia', methods=['GET', 'POST'])
+def academia():
+    # Ejemplo simple: traducir "casa" a braille
+    ejercicio = 'Traduce la palabra: casa'
+    palabra = 'casa'
+    resultado = None
+    puntaje = None
+
+    if request.method == 'POST':
+        respuesta = request.form.get('respuesta', '')
+        correcta = BrailleConverter.texto_a_braille(palabra)
+        if respuesta.strip() == correcta:
+            resultado = "¡Correcto!"
+            puntaje = 1
+        else:
+            resultado = f"Incorrecto. La respuesta correcta es: {correcta}"
+            puntaje = 0
+
+        # Guardar progreso en BD si está logueado
+        if 'usuario_id' in session:
+            ProgresoService.guardar_progreso(session['usuario_id'], ejercicio, puntaje)
+
+    return render_template('academia.html', ejercicio=ejercicio, resultado=resultado)
+
+@app.route('/progreso')
+def progreso():
+    if 'usuario_id' not in session:
+        flash('Debes iniciar sesión primero', 'warning')
+        return redirect(url_for('login'))
+    historial = ProgresoService.obtener_progreso(session['usuario_id'], limite=20)
+    return render_template('progreso.html', historial=historial)
+
 
 if __name__ == '__main__':
     try:
