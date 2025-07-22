@@ -4,6 +4,8 @@ import os
 import logging
 from werkzeug.utils import secure_filename
 from config import Config
+from PyPDF2 import PdfReader
+import docx
 
 # Importar servicios/modelos propios
 from models.database_manager import DatabaseManager
@@ -73,6 +75,7 @@ def logout():
     flash('Sesión cerrada correctamente.', 'success')
     return redirect(url_for('index'))
 
+
 @app.route('/convertir-archivo', methods=['GET', 'POST'])
 def convertir_archivo():
     """Conversión de archivos de texto a Braille."""
@@ -86,7 +89,26 @@ def convertir_archivo():
                 flash('No se seleccionó archivo', 'danger')
                 return redirect(request.url)
             if archivo and allowed_file(archivo.filename):
-                contenido = archivo.read().decode('utf-8')
+                filename = archivo.filename.lower()
+                ext = filename.rsplit('.', 1)[-1]
+                contenido = ''
+                if ext == 'txt':
+                    contenido = archivo.read().decode('utf-8')
+                elif ext == 'pdf':
+                    reader = PdfReader(archivo)
+                    for page in reader.pages:
+                        contenido += page.extract_text() or ''
+                elif ext == 'docx':
+                    doc = docx.Document(archivo)
+                    contenido = '\n'.join([p.text for p in doc.paragraphs])
+                else:
+                    flash('Tipo de archivo no permitido', 'danger')
+                    return redirect(request.url)
+
+                if not contenido.strip():
+                    flash('El archivo está vacío o no se pudo extraer el texto.', 'danger')
+                    return redirect(request.url)
+
                 contenido_braille = BrailleConverter.procesar_archivo(contenido)
                 # Guarda conversión en historial si está logueado
                 if 'usuario_id' in session:
@@ -95,22 +117,25 @@ def convertir_archivo():
                         f"Archivo: {archivo.filename}",
                         contenido_braille[:500] + "..." if len(contenido_braille) > 500 else contenido_braille
                     )
-                return render_template('resultado.html', {
-                    'nombre_archivo': archivo.filename,
-                    'contenido_original': contenido,
-                    'contenido_braille': contenido_braille,
-                    'estadisticas': {
-                        'caracteres_originales': len(contenido),
-                        'caracteres_braille': len(contenido_braille),
-                        'lineas': contenido.count('\n') + 1
-                    }
-                })
+                return render_template(
+    'resultado.html',
+    nombre_archivo=archivo.filename,
+    contenido_original=contenido,
+    contenido_braille=contenido_braille,
+    estadisticas={
+        'caracteres_originales': len(contenido),
+        'caracteres_braille': len(contenido_braille),
+        'lineas': contenido.count('\n') + 1
+    }
+)
+
             else:
                 flash('Tipo de archivo no permitido', 'danger')
         except Exception as e:
             logger.error(f"Error procesando archivo: {e}")
             flash('Error procesando archivo', 'danger')
     return render_template('convertir_archivo.html')
+
 
 @app.route('/academia', methods=['GET', 'POST'])
 def academia():

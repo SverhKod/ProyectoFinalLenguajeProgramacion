@@ -1,2 +1,7 @@
-flask
-flask-mysqldb
+Flask                   # Framework web principal
+Werkzeug                # Manejo seguro de archivos
+python-dotenv           # Para variables de entorno .env
+PyPDF2                  # Lectura de archivos PDF
+python-docx             # Lectura de archivos DOCX (Word)
+mysql-connector-python  # Conector de MySQL para Python 
+Flask-MySQLdb           # Integración Flask + MySQLdb
