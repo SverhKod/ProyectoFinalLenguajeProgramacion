@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Braille App - Convierte y Aprende</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css')}}">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-icons/1.11.1/font/bootstrap-icons.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" rel="stylesheet">
+</head>
+<body>
+    <!-- Hero Section -->
+    <section class="hero-bg d-flex align-items-center justify-content-center style="min-height: 100vh;">
+        <div class="container hero-content">
+            <div class="row justify-content-center text-center text-white">
+                <div class="col-lg-10">
+                    <h1 class="hero-title animate__animated animate__fadeInDown">
+                        <i class="bi bi-eye-fill me-3"></i>Braille World
+                    </h1>
+                    <p class="hero-subtitle animate__animated animate__fadeInUp animate__delay-1s">
+                        Transforma la forma en que interactúas con el Braille.<br>
+                        <strong>Convierte, aprende y domina</strong> el sistema de lectura táctil más importante del mundo.
+                    </p>
+                    <div class="d-flex flex-column flex-md-row gap-3 justify-content-center animate__animated animate__fadeInUp animate__delay-2s">
+                        <a href="#servicios" class="btn btn-modern btn-primary-modern">
+                            <i class="bi bi-rocket-takeoff me-2"></i>Descubrir funciones
+                        </a>
+                        <a href="/convertir-archivo" class="btn btn-modern btn-outline-modern">
+                            <i class="bi bi-cloud-upload me-2"></i>Convertir ahora
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Estadísticas -->
+    <section class="container">
+        <div class="stats-section fade-in-up">
+            <div class="row">
+                <div class="col-md-4">
+                    <div class="stat-item">
+                        <div class="stat-number">1000+</div>
+                        <div class="stat-label">Archivos Convertidos</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-item">
+                        <div class="stat-number">500+</div>
+                        <div class="stat-label">Estudiantes Activos</div>
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <div class="stat-item">
+                        <div class="stat-number">98%</div>
+                        <div class="stat-label">Satisfacción</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Servicios Principales -->
+    <section id="servicios" class="container my-5">
+        <div class="text-center mb-5 fade-in-up">
+            <h2 class="display-5 fw-bold mb-3">¿Qué puedes hacer aquí?</h2>
+            <p class="lead text-muted">Explora nuestras herramientas diseñadas para hacer el Braille más accesible</p>
+        </div>
+        
+        <div class="row g-4 justify-content-center">
+            <!-- Conversión de Archivos -->
+            <div class="col-lg-5 fade-in-left">
+                <div class="card service-card h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon">
+                            <i class="bi bi-file-earmark-arrow-down"></i>
+                        </div>
+                        <h4 class="card-title fw-bold mb-3">Conversión Inteligente</h4>
+                        <p class="card-text text-muted mb-4">
+                            Convierte cualquier archivo de texto a Braille con opciones avanzadas de formato. 
+                            Compatible con múltiples idiomas y configuraciones personalizables para impresión.
+                        </p>
+                        <div class="mb-3">
+                            <span class="badge bg-primary me-2">TXT</span>
+                            <span class="badge bg-success me-2">PDF</span>
+                            <span class="badge bg-info">DOCX</span>
+                        </div>
+                        <a href="/convertir-archivo" class="btn btn-modern btn-primary-modern">
+                            <i class="bi bi-cloud-upload me-2"></i>Convertir Archivo
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Aprendizaje -->
+            <div class="col-lg-5 fade-in-right">
+                <div class="card service-card h-100">
+                    <div class="card-body text-center p-4">
+                        <div class="service-icon" style="background: var(--success-gradient);">
+                            <i class="bi bi-controller"></i>
+                        </div>
+                        <h4 class="card-title fw-bold mb-3">Academia Interactiva</h4>
+                        <p class="card-text text-muted mb-4">
+                            Domina el Braille con ejercicios gamificados, seguimiento de progreso en tiempo real 
+                            y desafíos adaptativos que se ajustan a tu nivel de aprendizaje.
+                        </p>
+                        <div class="mb-3">
+                            <span class="badge bg-success me-2">Gamificado</span>
+                            <span class="badge bg-warning me-2">Progreso</span>
+                            <span class="badge bg-danger">Certificados</span>
+                        </div>
+                        <a href="/aprende" class="btn btn-modern btn-success-modern">
+                            <i class="bi bi-joystick me-2"></i>Comenzar a Aprender
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Conversión Rápida -->
+    <section class="container mb-5">
+        <div class="row justify-content-center">
+            <div class="col-lg-9 fade-in-up">
+                <div class="quick-converter">
+                    <div class="converter-header text-center">
+                        <h3 class="mb-0">
+                            <i class="bi bi-lightning-charge-fill me-2"></i>
+                            Conversor en Tiempo Real
+                        </h3>
+                        <p class="mb-0 mt-2 opacity-75">Escribe y ve la traducción instantáneamente</p>
+                    </div>
+                    <div class="p-4">
+                        <div class="mb-4">
+                            <label for="entrada" class="form-label fw-semibold">
+                                <i class="bi bi-keyboard me-2"></i>Tu texto:
+                            </label>
+                            <textarea 
+                                id="entrada" 
+                                class="form-control form-control-lg" 
+                                rows="3" 
+                                placeholder="Comienza a escribir aquí para ver la magia del Braille..."
+                                style="border-radius: 15px; border: 2px solid #e9ecef; font-size: 1.1rem;"
+                            ></textarea>
+                        </div>
+                        <div>
+                            <label class="form-label fw-semibold text-muted">
+                                <i class="bi bi-eye-fill me-2"></i>Resultado en Braille:
+                            </label>
+                            <div 
+                                id="braille" 
+                                class="braille-output d-flex align-items-center justify-content-center p-4"
+                            >
+                                <span class="text-muted">
+                                    <i class="bi bi-cursor-text me-2"></i>
+                                    El texto convertido aparecerá aquí...
+                                </span>
+                            </div>
+                        </div>
+                        <div class="text-center mt-4">
+                            <button class="btn btn-modern btn-primary-modern" onclick="copyBraille()">
+                                <i class="bi bi-clipboard me-2"></i>Copiar Braille
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Testimonios -->
+    <section class="container mb-5">
+        <div class="text-center mb-5 fade-in-up">
+            <h3 class="display-6 fw-bold">Lo que dicen nuestros usuarios</h3>
+        </div>
+        <div class="row">
+            <div class="col-md-6 fade-in-left">
+                <div class="testimonial-card">
+                    <div class="testimonial-text">
+                        "Esta aplicación cambió completamente mi forma de trabajar con materiales en Braille. 
+                        Es rápida, precisa y muy fácil de usar."
+                    </div>
+                    <div class="testimonial-author">- María González, Docente</div>
+                </div>
+            </div>
+            <div class="col-md-6 fade-in-right">
+                <div class="testimonial-card">
+                    <div class="testimonial-text">
+                        "Los juegos de aprendizaje son increíbles. Mi hija aprendió Braille 
+                        de manera divertida y efectiva."
+                    </div>
+                    <div class="testimonial-author">- Carlos Mendoza, Padre de familia</div>
+                </div>
+            </div>
+        </div>
+    </section>
+    <script src="../static/js/script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap/5.3.2/js/bootstrap.bundle.min.js"></script>
+
+</body>
+</html>

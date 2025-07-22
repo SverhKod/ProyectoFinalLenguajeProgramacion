@@ -1,89 +1,90 @@
-# app.py
-# ===================================
-# Github: https://github.com/SverhKod/ProyectoFinalLenguajeProgramacion
-# -----------------------------------
-# Este backend maneja:
-#  - Conversión entre texto y Braille (y viceversa)
-#  - Historial real (se guarda en archivo .json)
-#  - Páginas accesibles (conversor, historial, ayuda)
-# -----------------------------------
-
-from flask import Flask, render_template, request, jsonify
-from src.braille_converter import BrailleConverter
-import json
-from datetime import datetime
+from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session
 import os
+import logging
+from werkzeug.utils import secure_filename
+from config import Config
+
+from models.database_manager import DatabaseManager
+
+from models.braille_converter import BrailleConverter
+from models.usuario_service import UsuarioService
+from models.historial_service import HistorialService
+
+
+logging.basicConfig(level=logging.INFO)
+logger = logging.getLogger(__name__)
 
 app = Flask(__name__)
-converter = BrailleConverter()
+app.secret_key = Config.SECRET_KEY
+app.config['UPLOAD_FOLDER'] = Config.UPLOAD_FOLDER
+ALLOWED_EXTENSIONS = Config.ALLOWED_EXTENSIONS
 
-# Ruta del archivo historial (para persistencia entre reinicios)
-HISTORY_FILE = 'history.json'
+# Crea carpeta uploads si no existe
+os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
-# ---------- Función auxiliar para manejar historial en archivo ----------
-def load_history():
-    if not os.path.exists(HISTORY_FILE):
-        return []
-    with open(HISTORY_FILE, 'r', encoding='utf-8') as f:
-        return json.load(f)
+def allowed_file(filename):
+    return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-def save_history(data):
-    with open(HISTORY_FILE, 'w', encoding='utf-8') as f:
-        json.dump(data, f, ensure_ascii=False, indent=2)
-
-# ---------- Rutas principales ----------
 @app.route('/')
-def home():
-    """
-    Página principal: conversor de texto y Braille.
-    """
-    return render_template('converter_voice.html')
+def index():
+    try:
+        estadisticas = HistorialService.obtener_estadisticas()
+        return render_template('index.html', estadisticas=estadisticas)
+    except Exception as e:
+        logger.error(f"Error en página de inicio: {e}")
+        return render_template('index.html', estadisticas=[])
 
-@app.route('/convert', methods=['POST'])
-def convert():
-    """
-    Convierte texto <-> Braille, guarda en historial (persistente).
-    """
-    text = request.form.get('text', '')
-    mode = request.form.get('mode', 'to_braille')
-    if mode == 'to_braille':
-        result = converter.text_to_braille(text)
-        mode_str = "Texto → Braille"
-    else:
-        result = converter.braille_to_text(text)
-        mode_str = "Braille → Texto"
-    # Leer historial actual
-    history_data = load_history()
-    # Guardar nueva conversión
-    history_data.append({
-        "input": text,
-        "output": result,
-        "mode": mode_str,
-        "date": datetime.now().strftime('%Y-%m-%d %H:%M')
-    })
-    save_history(history_data)
-    return jsonify({'result': result})
+# (Las demás rutas igual que en tu código, solo importa los servicios desde models)
 
-@app.route('/history')
-def history():
-    """
-    Página de historial (tabla accesible).
-    """
-    return render_template('history_smart.html')
+# Ejemplo para una ruta:
+@app.route('/convertir-archivo', methods=['GET', 'POST'])
+def convertir_archivo():
+    if request.method == 'POST':
+        try:
+            if 'archivo' not in request.files:
+                flash('No se seleccionó archivo', 'error')
+                return redirect(request.url)
+            archivo = request.files['archivo']
+            if archivo.filename == '':
+                flash('No se seleccionó archivo', 'error')
+                return redirect(request.url)
+            if archivo and allowed_file(archivo.filename):
+                contenido = archivo.read().decode('utf-8')
+                contenido_braille = BrailleConverter.procesar_archivo(contenido)
+                if 'usuario_id' in session:
+                    HistorialService.guardar_conversion(
+                        session['usuario_id'],
+                        f"Archivo: {archivo.filename}",
+                        contenido_braille[:500] + "..." if len(contenido_braille) > 500 else contenido_braille
+                    )
+                return render_template('resultado.html', {
+                    'nombre_archivo': archivo.filename,
+                    'contenido_original': contenido,
+                    'contenido_braille': contenido_braille,
+                    'estadisticas': {
+                        'caracteres_originales': len(contenido),
+                        'caracteres_braille': len(contenido_braille),
+                        'lineas': contenido.count('\n') + 1
+                    }
+                })
+            else:
+                flash('Tipo de archivo no permitido', 'error')
+        except Exception as e:
+            logger.error(f"Error procesando archivo: {e}")
+            flash('Error procesando archivo', 'error')
+    return render_template('convertir_archivo.html')
 
-@app.route('/history-data')
-def history_data_api():
-    """
-    API: Devuelve el historial actual en JSON.
-    """
-    return jsonify(load_history())
-
-@app.route('/accessibility-help')
-def accessibility_help():
-    """
-    Página de ayuda y tips de accesibilidad.
-    """
-    return render_template('accessibility_help.html')
+# (Resto de tus rutas igual...)
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    try:
+        connection = DatabaseManager.get_connection()
+        if connection:
+            logger.info("Conexión a la base de datos exitosa")
+            connection.close()
+        else:
+            logger.error("No se pudo conectar a la base de datos")
+    except Exception as e:
+        logger.error(f"Error verificando base de datos: {e}")
+
+    app.run(debug=True, host='0.0.0.0', port=5000)
