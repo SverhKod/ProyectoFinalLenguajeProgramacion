@@ -1,5 +1,5 @@
 # app.py – Aplicación Principal Flask
-from flask import Flask, render_template, request, jsonify, redirect, url_for, flash, session
+from flask import Flask, render_template, request, redirect, url_for, flash, session
 import os
 import logging
 from werkzeug.utils import secure_filename
@@ -13,7 +13,7 @@ from models.braille_converter import BrailleConverter
 from models.progreso_service import ProgresoService
 from models.historial_service import HistorialService
 from services.usuario_service import UsuarioService
-
+from controllers.academia_controller import academia_bp
 # Configuración de logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
@@ -24,14 +24,14 @@ app.secret_key = Config.SECRET_KEY
 app.config['UPLOAD_FOLDER'] = Config.UPLOAD_FOLDER
 ALLOWED_EXTENSIONS = Config.ALLOWED_EXTENSIONS
 
-# ---- Paradigma OO: Clase para lecciones ----
+# ----------------- Paradigma OO: Clase para lecciones -----------------
 class LeccionBraille:
     def __init__(self, titulo, contenido, ejercicios):
         self.titulo = titulo
         self.contenido = contenido
         self.ejercicios = ejercicios
 
-# ---- Paradigma funcional: función para corregir respuestas ----
+# ----------------- Paradigma funcional: función para corregir respuestas -----------------
 def verificar_respuesta(respuesta_usuario, respuesta_correcta):
     return respuesta_usuario.strip().lower() == respuesta_correcta.strip().lower()
 
@@ -41,6 +41,9 @@ os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 def allowed_file(filename):
     """Verifica si el archivo tiene una extensión permitida."""
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
+
+
+app.register_blueprint(academia_bp)
 
 # ----------------- RUTAS PRINCIPALES -----------------
 
@@ -54,8 +57,9 @@ def index():
         logger.error(f"Error en página de inicio: {e}")
         return render_template('index.html', estadisticas=[])
 
-
-    """Ruta para inicio de sesión sencillo (solo email)."""
+@app.route('/login', methods=['GET', 'POST'])
+def login():
+    """Inicio de sesión sencillo (solo email)."""
     if request.method == 'POST':
         email = request.form.get('email', '').strip()
         usuario = UsuarioService.obtener_usuario_por_email(email)
@@ -75,10 +79,25 @@ def logout():
     flash('Sesión cerrada correctamente.', 'success')
     return redirect(url_for('index'))
 
+@app.route('/registro', methods=['GET', 'POST'])
+def registro():
+    """Registro de nuevo usuario."""
+    if request.method == 'POST':
+        nombre = request.form.get('nombre', '').strip()
+        email = request.form.get('email', '').strip()
+        if not nombre or not email:
+            flash('Debes ingresar nombre y correo.', 'danger')
+        elif UsuarioService.obtener_usuario_por_email(email):
+            flash('Ese correo ya está registrado.', 'danger')
+        else:
+            UsuarioService.crear_usuario(nombre, email)
+            flash('¡Usuario creado! Ahora inicia sesión.', 'success')
+            return redirect(url_for('login'))
+    return render_template('registro.html')
 
 @app.route('/convertir-archivo', methods=['GET', 'POST'])
 def convertir_archivo():
-    """Conversión de archivos de texto a Braille."""
+    """Conversión de archivos de texto (txt, pdf, docx) a Braille."""
     if request.method == 'POST':
         try:
             if 'archivo' not in request.files:
@@ -118,24 +137,22 @@ def convertir_archivo():
                         contenido_braille[:500] + "..." if len(contenido_braille) > 500 else contenido_braille
                     )
                 return render_template(
-    'resultado.html',
-    nombre_archivo=archivo.filename,
-    contenido_original=contenido,
-    contenido_braille=contenido_braille,
-    estadisticas={
-        'caracteres_originales': len(contenido),
-        'caracteres_braille': len(contenido_braille),
-        'lineas': contenido.count('\n') + 1
-    }
-)
-
+                    'resultado.html',
+                    nombre_archivo=archivo.filename,
+                    contenido_original=contenido,
+                    contenido_braille=contenido_braille,
+                    estadisticas={
+                        'caracteres_originales': len(contenido),
+                        'caracteres_braille': len(contenido_braille),
+                        'lineas': contenido.count('\n') + 1
+                    }
+                )
             else:
                 flash('Tipo de archivo no permitido', 'danger')
         except Exception as e:
             logger.error(f"Error procesando archivo: {e}")
             flash('Error procesando archivo', 'danger')
     return render_template('convertir_archivo.html')
-
 
 @app.route('/academia', methods=['GET', 'POST'])
 def academia():
@@ -164,10 +181,9 @@ def academia():
 
     return render_template('academia.html', ejercicio=ejercicio, resultado=resultado)
 
-# ---- Paradigma estructurado: ruta Flask ----
 @app.route('/aprende', methods=['GET', 'POST'])
 def aprende():
-    # Lista de lecciones como objetos OO
+    """Página de aprendizaje: lista de lecciones OO y quiz."""
     lecciones = [
         LeccionBraille(
             "¿Qué es el Braille?",
@@ -181,16 +197,14 @@ def aprende():
         )
     ]
     recursos = [
-        {"nombre": "Pack de Abecedario ", "url": "https://www.orientacionandujar.es/2024/11/11/pack-abecedario-braille-y-lse-y-juegos-didacticos/"},
+        {"nombre": "Pack de Abecedario", "url": "https://www.orientacionandujar.es/2024/11/11/pack-abecedario-braille-y-lse-y-juegos-didacticos/"},
         {"nombre": "Braille Bug", "url": "https://braillebug.org"}
     ]
     resultado = None
-    # Corrección funcional si el usuario responde al quiz
     if request.method == "POST":
         respuesta = request.form.get("respuesta", "")
         resultado = verificar_respuesta(respuesta, "Louis Braille")
     return render_template("aprende.html", lecciones=lecciones, recursos=recursos, resultado=resultado)
-
 
 @app.route('/progreso')
 def progreso():
@@ -200,66 +214,11 @@ def progreso():
         return redirect(url_for('login'))
     historial = ProgresoService.obtener_progreso(session['usuario_id'], limite=20)
     return render_template('progreso.html', historial=historial)
+
 @app.route('/diccionario')
 def diccionario():
+    """Diccionario Braille (simple)."""
     return render_template('diccionario.html')
-
-@app.route('/login', methods=['GET', 'POST'])
-def login():
-
-    """Ruta para inicio de sesión sencillo (solo email)."""
-    if request.method == 'POST':
-        email = request.form.get('email', '').strip()
-        usuario = UsuarioService.obtener_usuario_por_email(email)
-        if usuario:
-            session['usuario_id'] = usuario['id']
-            session['usuario_nombre'] = usuario['nombre']
-            flash(f'¡Bienvenido, {usuario["nombre"]}!', 'success')
-            return redirect(url_for('index'))
-        else:
-            flash('Usuario no encontrado.', 'danger')
-    return render_template('login.html')
-
-
-    """Cerrar sesión del usuario."""
-    session.clear()
-    flash('Sesión cerrada correctamente.', 'success')
-    return redirect(url_for('index'))
-    """Ruta para inicio de sesión sencillo (solo email)."""
-    if request.method == 'POST':
-        email = request.form.get('email', '').strip()
-        usuario = UsuarioService.obtener_usuario_por_email(email)
-        if usuario:
-            session['usuario_id'] = usuario['id']
-            session['usuario_nombre'] = usuario['nombre']
-            flash(f'¡Bienvenido, {usuario["nombre"]}!', 'success')
-            return redirect(url_for('index'))
-        else:
-            flash('Usuario no encontrado.', 'danger')
-    return render_template('login.html')
-
-
-    """Cerrar sesión del usuario."""
-    session.clear()
-    flash('Sesión cerrada correctamente.', 'success')
-    return redirect(url_for('index'))
-@app.route('/registro', methods=['GET', 'POST'])
-def registro():
-    """Registro de nuevo usuario."""
-    if request.method == 'POST':
-        nombre = request.form.get('nombre', '').strip()
-        email = request.form.get('email', '').strip()
-        if not nombre or not email:
-            flash('Debes ingresar nombre y correo.', 'danger')
-        elif UsuarioService.obtener_usuario_por_email(email):
-            flash('Ese correo ya está registrado.', 'danger')
-        else:
-            UsuarioService.crear_usuario(nombre, email)
-            flash('¡Usuario creado! Ahora inicia sesión.', 'success')
-            return redirect(url_for('login'))
-    return render_template('registro.html')
-
-
 
 # ----------------- INICIO DE LA APP -----------------
 if __name__ == '__main__':

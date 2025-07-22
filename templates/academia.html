@@ -1,13 +1,18 @@
 {% extends 'base.html' %}
 {% block content %}
-<section class="hero-bg d-flex align-items-center" style="min-height: 250px; border-radius: 0 0 30px 30px;">
+<section class="hero-bg d-flex align-items-center" style="min-height: 270px; border-radius: 0 0 32px 32px;">
   <div class="container text-center text-white py-4">
     <h1 class="display-5 fw-bold mb-2 animate__animated animate__fadeInDown">
       <i class="bi bi-controller me-2"></i> Academia Interactiva
     </h1>
-    <p class="lead animate__animated animate__fadeInUp animate__delay-1s">
-      Domina el Braille con ejercicios interactivos y seguimiento de progreso.
+    <p class="lead animate__animated animate__fadeInUp animate__delay-1s mb-2">
+      Aprende Braille con ejercicios gamificados y <b>seguimiento de progreso</b>.
     </p>
+    <div class="d-flex justify-content-center gap-3">
+      <span class="badge bg-primary fs-6">Palabras</span>
+      <span class="badge bg-warning text-dark fs-6">Frases</span>
+      <span class="badge bg-success fs-6">Desafíos</span>
+    </div>
   </div>
 </section>
 
@@ -16,29 +21,69 @@
     <div class="col-lg-7">
       <div class="card shadow-lg p-4 service-card">
         <div class="card-body">
-          <h2 class="fw-bold mb-4 text-center">
+          <div class="d-flex justify-content-between mb-3">
+            <span class="badge bg-info px-3 py-2">Reto: {{ palabra|capitalize }}</span>
+            <span class="badge bg-light text-dark px-3 py-2">Nivel {{ nivel or 1 }}</span>
+          </div>
+          <h2 class="fw-bold mb-3 text-center">
             <i class="bi bi-lightbulb"></i> {{ ejercicio }}
           </h2>
           <form method="POST" class="mb-3">
             <input type="text" name="respuesta" class="form-control form-control-lg mb-3"
-              placeholder="Escribe la respuesta en Braille...">
+              placeholder="Escribe la respuesta en Braille... Ej: ⠉⠁⠎⠁" autocomplete="off">
             <button class="btn btn-modern btn-primary-modern w-100" type="submit">
-              <i class="bi bi-play"></i> Comprobar
+              <i class="bi bi-play"></i> Comprobar Respuesta
             </button>
           </form>
           {% if resultado %}
-          <div class="alert alert-info text-center animate__animated animate__fadeInUp">
+          <div class="alert alert-info text-center animate__animated animate__fadeInUp mb-3">
             {{ resultado }}
           </div>
           {% endif %}
+
+          <div class="alert alert-secondary small text-center mb-2" style="background: #f8fafc;">
+            <i class="bi bi-info-circle me-2"></i>
+            <b>¿No sabes cómo escribir en Braille?</b> Usa el conversor en tiempo real para practicar.<br>
+            <span class="text-muted">Ejemplo: “casa” = <b>⠉⠁⠎⠁</b> &middot; “hola” = <b>⠓⠕⠇⠁</b></span>
+          </div>
+        </div>
+        <div class="card-footer bg-transparent border-0 text-center">
+          <a href="{{ url_for('academia', palabra='aleatorio') }}" class="btn btn-outline-modern btn-sm me-2">
+            <i class="bi bi-arrow-repeat"></i> Nuevo reto aleatorio
+          </a>
+          <a href="/progreso" class="btn btn-outline-success btn-sm ms-2">
+            <i class="bi bi-graph-up"></i> Ver mi progreso
+          </a>
+          <a href="/aprende" class="btn btn-outline-info btn-sm ms-2">
+            <i class="bi bi-lightbulb"></i> Consejos y teoría
+          </a>
         </div>
       </div>
-      <div class="text-center mt-4">
-        <a href="/progreso" class="btn btn-outline-modern">
-          <i class="bi bi-graph-up"></i> Ver mi progreso
-        </a>
+
+      <div class="mt-5">
+        <div class="alert alert-light border shadow-sm text-center">
+          <h6 class="mb-2"><i class="bi bi-emoji-smile"></i> Ayuda visual</h6>
+          <div>
+            <span class="badge bg-light text-dark mb-1">"gato" = ⠛⠁⠞⠕</span>
+            <span class="badge bg-light text-dark mb-1">"sol" = ⠎⠕⠇</span>
+            <span class="badge bg-light text-dark mb-1">"familia" = ⠋⠁⠍⠊⠇⠊⠁</span>
+            <span class="badge bg-light text-dark mb-1">"gracias" = ⠛⠗⠁⠉⠊⠁⠎</span>
+          </div>
+          <div class="small mt-2">*Puedes copiar el Braille con el conversor de la página principal</div>
+        </div>
       </div>
     </div>
+  </div>
+</div>
+
+<div class="container mt-5 mb-2">
+  <div class="card p-3 bg-light border-0">
+    <h6 class="fw-bold mb-2">
+      <i class="bi bi-keyboard"></i> ¿Cómo escribir Braille en el teclado?
+    </h6>
+    <p class="mb-0 small text-muted">
+      Escribe los símbolos Unicode de Braille directamente. Si no los tienes, usa el <a href="/" class="text-primary text-decoration-underline">Conversor en Tiempo Real</a> y pega aquí.
+    </p>
   </div>
 </div>
 {% endblock %}

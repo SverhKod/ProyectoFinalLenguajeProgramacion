@@ -1,12 +1,23 @@
 {% extends 'base.html' %}
 {% block content %}
+<section class="hero-bg d-flex align-items-center" style="min-height: 180px; border-radius: 0 0 30px 30px;">
+  <div class="container text-center text-white py-3">
+    <h1 class="display-6 fw-bold animate__animated animate__fadeInDown">
+      <i class="bi bi-graph-up"></i> Mi Progreso
+    </h1>
+    <p class="lead animate__animated animate__fadeInUp animate__delay-1s">
+      ¡Sigue practicando para desbloquear nuevos retos!
+    </p>
+  </div>
+</section>
+
 <div class="container my-5">
   <div class="row justify-content-center">
     <div class="col-lg-8">
       <div class="card shadow p-4">
-        <h3 class="fw-bold mb-4 text-center">
-          <i class="bi bi-graph-up"></i> Mi Progreso
-        </h3>
+        <h4 class="fw-bold mb-4 text-center">
+          <i class="bi bi-list-check"></i> Historial de Ejercicios
+        </h4>
         {% if historial %}
         <table class="table table-striped table-hover rounded">
           <thead class="table-dark">
@@ -20,12 +31,27 @@
             {% for item in historial %}
             <tr>
               <td>{{ item.ejercicio }}</td>
-              <td>{{ item.puntaje }}</td>
+              <td>
+                {% if item.puntaje > 0 %}
+                  <span class="badge bg-success"><i class="bi bi-check-circle"></i> {{ item.puntaje }}</span>
+                {% else %}
+                  <span class="badge bg-danger"><i class="bi bi-x-circle"></i> {{ item.puntaje }}</span>
+                {% endif %}
+              </td>
               <td>{{ item.fecha.strftime('%d/%m/%Y %H:%M') }}</td>
             </tr>
             {% endfor %}
           </tbody>
         </table>
+        <!-- Barra de progreso SEGURA y responsiva -->
+        {% set correctos = historial | selectattr('puntaje', 'equalto', 1) | list %}
+        {% set total = historial|length %}
+        {% set porcentaje = (correctos|length * 100 // total) if total > 0 else 0 %}
+        <div class="progress my-3" style="height:24px;">
+          <div class="progress-bar bg-success" role="progressbar"style="width: {{porcentaje}}%;">
+            Progreso: {{ correctos|length }}/{{ total }}
+          </div>
+        </div>
         {% else %}
         <div class="alert alert-info text-center">¡Aún no tienes progreso registrado!</div>
         {% endif %}
@@ -34,6 +60,10 @@
             <i class="bi bi-arrow-left"></i> Volver a la academia
           </a>
         </div>
+      </div>
+      <div class="mt-4 text-center small">
+        <span class="badge bg-success me-1">✔ Correcto</span>
+        <span class="badge bg-danger">✖ Incorrecto</span>
       </div>
     </div>
   </div>

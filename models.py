@@ -1,4 +1,3 @@
-# models.py
 class Usuario:
     """
     Paradigma usado: Orientado a objetos.
