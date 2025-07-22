@@ -22,6 +22,17 @@ app.secret_key = Config.SECRET_KEY
 app.config['UPLOAD_FOLDER'] = Config.UPLOAD_FOLDER
 ALLOWED_EXTENSIONS = Config.ALLOWED_EXTENSIONS
 
+# ---- Paradigma OO: Clase para lecciones ----
+class LeccionBraille:
+    def __init__(self, titulo, contenido, ejercicios):
+        self.titulo = titulo
+        self.contenido = contenido
+        self.ejercicios = ejercicios
+
+# ---- Paradigma funcional: función para corregir respuestas ----
+def verificar_respuesta(respuesta_usuario, respuesta_correcta):
+    return respuesta_usuario.strip().lower() == respuesta_correcta.strip().lower()
+
 # Crea la carpeta de uploads si no existe
 os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
 
@@ -128,6 +139,34 @@ def academia():
 
     return render_template('academia.html', ejercicio=ejercicio, resultado=resultado)
 
+# ---- Paradigma estructurado: ruta Flask ----
+@app.route('/aprende', methods=['GET', 'POST'])
+def aprende():
+    # Lista de lecciones como objetos OO
+    lecciones = [
+        LeccionBraille(
+            "¿Qué es el Braille?",
+            "El Braille es un sistema de lectura y escritura táctil diseñado para personas ciegas.",
+            ["¿Quién inventó el Braille?", "¿En qué país se originó?"]
+        ),
+        LeccionBraille(
+            "Cómo se lee el Braille",
+            "Cada letra se representa por un patrón de puntos en relieve.",
+            ["¿Cuántos puntos tiene una celda Braille?", "¿Cómo se representa la letra 'A'?"]
+        )
+    ]
+    recursos = [
+        {"nombre": "Pack de Abecedario ", "url": "https://www.orientacionandujar.es/2024/11/11/pack-abecedario-braille-y-lse-y-juegos-didacticos/"},
+        {"nombre": "Braille Bug", "url": "https://braillebug.org"}
+    ]
+    resultado = None
+    # Corrección funcional si el usuario responde al quiz
+    if request.method == "POST":
+        respuesta = request.form.get("respuesta", "")
+        resultado = verificar_respuesta(respuesta, "Louis Braille")
+    return render_template("aprende.html", lecciones=lecciones, recursos=recursos, resultado=resultado)
+
+
 @app.route('/progreso')
 def progreso():
     """Página de progreso personal. Solo usuarios logueados pueden verla."""
@@ -139,10 +178,6 @@ def progreso():
 @app.route('/diccionario')
 def diccionario():
     return render_template('diccionario.html')
-
-@app.route('/aprende')
-def aprende():
-    return render_template('aprende.html')
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -198,6 +233,7 @@ def registro():
             flash('¡Usuario creado! Ahora inicia sesión.', 'success')
             return redirect(url_for('login'))
     return render_template('registro.html')
+
 
 
 # ----------------- INICIO DE LA APP -----------------

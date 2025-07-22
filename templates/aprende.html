@@ -1,15 +1,49 @@
 {% extends 'base.html' %}
 {% block content %}
 <section class="container my-5">
-  <h1 class="display-5 fw-bold mb-4 text-center"><i class="bi bi-mortarboard"></i> Aprende Braille</h1>
-  <p class="lead text-center mb-5">Explora materiales y tips para aprender Braille de forma autodidacta.</p>
-  <div class="card p-4">
+  <h1 class="display-5 fw-bold mb-4 text-center">
+    <i class="bi bi-mortarboard"></i> Aprende Braille
+  </h1>
+  <p class="lead text-center mb-5">
+    Explora materiales y tips para aprender Braille de forma autodidacta.
+  </p>
+  <div class="card p-4 mb-4">
     <ul>
-      <li>¿Qué es el Braille?</li>
-      <li>Cómo se lee el Braille</li>
-      <li>Ejercicios para practicar</li>
-      <li>Recursos interactivos (enlace a Academia)</li>
+      {% for leccion in lecciones %}
+        <li>
+          <strong>{{ leccion.titulo }}</strong>: {{ leccion.contenido }}
+          <ul>
+            {% for ejercicio in leccion.ejercicios %}
+              <li>{{ ejercicio }}</li>
+            {% endfor %}
+          </ul>
+        </li>
+      {% endfor %}
     </ul>
+  </div>
+  <div class="card p-4 mb-4">
+    <h5>Recursos recomendados:</h5>
+    <ul>
+      {% for recurso in recursos %}
+        <li>
+          <a href="{{ recurso.url }}" target="_blank">{{ recurso.nombre }}</a>
+        </li>
+      {% endfor %}
+    </ul>
+  </div>
+  <div class="card p-4">
+    <h5>Quiz rápido: ¿Quién inventó el Braille?</h5>
+    <form method="POST">
+      <input class="form-control mb-2" name="respuesta" placeholder="Escribe tu respuesta">
+      <button class="btn btn-primary" type="submit">Verificar</button>
+    </form>
+    {% if resultado is not none %}
+      {% if resultado %}
+        <div class="alert alert-success mt-2">¡Correcto! 🎉</div>
+      {% else %}
+        <div class="alert alert-danger mt-2">Incorrecto. Intenta de nuevo.</div>
+      {% endif %}
+    {% endif %}
   </div>
 </section>
 {% endblock %}
